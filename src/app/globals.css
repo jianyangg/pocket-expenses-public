@@ -232,44 +232,6 @@ header {
   color: var(--muted);
   font-size: 12px;
 }
-.entry {
-  margin: 0 0 24px;
-}
-.mobile-entry-toggle {
-  display: none;
-}
-.entry-saved {
-  margin-top: 8px;
-  color: var(--green);
-  font-size: 12px;
-}
-.entry-line {
-  display: flex;
-  gap: 10px;
-}
-.entry-line input {
-  flex: 1;
-  font-size: 17px;
-  padding: 16px;
-  background: var(--paper);
-  border-color: transparent;
-}
-.entry-line button {
-  min-width: 90px;
-}
-.entry-options {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  margin: 14px 0;
-  flex-wrap: wrap;
-}
-.entry-options input {
-  padding: 6px 8px;
-  border: 0;
-  font-size: 12px;
-  color: var(--muted);
-}
 .segments {
   display: flex;
   background: var(--paper);
@@ -541,39 +503,6 @@ footer {
   .shell {
     padding: 0 20px 200px;
   }
-  .panel.entry {
-    position: fixed;
-    z-index: 20;
-    bottom: var(--keyboard-offset, 0px);
-    left: 0;
-    right: 0;
-    margin: 0;
-    border-radius: 18px 18px 0 0;
-    border-bottom: 0;
-    padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
-    box-shadow: 0 -8px 28px #202b2510;
-    max-height: 65dvh;
-    overflow-y: auto;
-  }
-  .entry .section-head {
-    margin-bottom: 10px;
-  }
-  .entry h2 {
-    font-size: 14px;
-  }
-  .entry .entry-line input {
-    font-size: 16px;
-  }
-  .mobile-entry-toggle {
-    display: block;
-  }
-  .entry[data-expanded="false"] .entry-options,
-  .entry .hint {
-    display: none;
-  }
-  .shell:has(.entry[data-expanded="true"]) {
-    padding-bottom: 300px;
-  }
   .balances {
     grid-template-columns: 1fr 1fr;
   }
@@ -608,9 +537,6 @@ footer {
   .panel {
     padding: 20px;
   }
-  .entry-options {
-    gap: 8px;
-  }
   .section-head > span {
     display: none;
   }
@@ -632,14 +558,6 @@ footer {
   .balance-card strong {
     font-size: 26px;
   }
-  .entry-line input {
-    font-size: 16px;
-    width: 100%;
-  }
-  .entry-line button {
-    min-width: 60px;
-    padding: 12px;
-  }
   .search {
     width: 115px;
   }
@@ -656,21 +574,9 @@ footer {
     scroll-behavior: auto !important;
   }
 }
-.entry-fields {
-  display: grid;
-  grid-template-columns: minmax(110px, 1fr) minmax(0, 3fr);
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.entry-fields label,
 .tag-picker > label {
   font-size: 12px;
   color: var(--muted);
-}
-.entry-fields input {
-  width: 100%;
-  font-size: 16px;
-  margin-top: 5px;
 }
 .amount-field {
   display: flex;
@@ -683,14 +589,6 @@ footer {
 .amount-field button {
   padding: 8px;
   min-width: 32px;
-}
-.entry-tag-line {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-.entry-tag-line > button {
-  margin-top: 22px;
 }
 .tag-picker {
   flex: 1;
@@ -726,16 +624,6 @@ footer {
 @media (max-width: 850px) {
   .shell {
     padding-bottom: 310px;
-  }
-  .shell:has(.entry[data-expanded="true"]) {
-    padding-bottom: 430px;
-  }
-  .entry-fields {
-    grid-template-columns: minmax(115px, 1fr) minmax(0, 2fr);
-    gap: 8px;
-  }
-  .entry-tag-line {
-    gap: 8px;
   }
   .tag-suggestions {
     max-height: 68px;
@@ -804,8 +692,7 @@ footer {
   gap: 8px;
 }
 @media (max-width: 850px) {
-  .shell,
-  .shell:has(.entry[data-expanded="true"]) {
+  .shell {
     padding-bottom: 100px;
   }
   .expense-dialog {
@@ -819,7 +706,8 @@ footer {
 .expense-dialog [hidden] {
   display: none;
 }
-/* Compact dashboard: balances first, details on demand. */
+/* Compact dashboard: balances first,
+details on demand. */
 .shell {
   max-width: 960px;
 }
@@ -923,13 +811,6 @@ footer {
   justify-content: space-between;
   gap: 12px;
   font-size: 13px;
-}
-.history-summary {
-  margin-bottom: 16px;
-}
-.history-summary p {
-  margin-top: 12px;
-  line-height: 1.6;
 }
 .show-more {
   width: 100%;
