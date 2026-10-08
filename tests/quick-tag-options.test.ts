@@ -29,3 +29,13 @@ test("search still exposes distinct user labels, normalizes duplicates and exclu
     [],
   );
 });
+
+test("selected tags suppress overlapping shortcuts while search keeps them available", () => {
+  assert.deepEqual(
+    quickTagOptions(["food", "dining", "shopping"], "", ["dining"]),
+    ["shopping"],
+  );
+  assert.deepEqual(quickTagOptions(["food", "dining"], "food", ["dining"]), [
+    "food",
+  ]);
+});

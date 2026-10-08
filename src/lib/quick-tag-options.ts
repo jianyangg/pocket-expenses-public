@@ -21,7 +21,8 @@ export function quickTagOptions(
   for (const tag of candidates) {
     if (tag === "chase") continue;
     const family = families.find((g) => g.includes(tag));
-    if (family && result.some((t) => family.includes(t))) continue;
+    if (family && [...result, ...chosen].some((t) => family.includes(t)))
+      continue;
     result.push(tag);
     if (result.length === 4) break;
   }
