@@ -5,6 +5,7 @@ import "./quick-entry.css";
 import "./category-details.css";
 import "./financial-report.css";
 import "./modal-controls.css";
+import "./chart-interactions.css";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,

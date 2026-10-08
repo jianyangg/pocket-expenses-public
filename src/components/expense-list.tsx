@@ -62,6 +62,13 @@ export default function ExpenseList({
                     )}{" "}
                     <span className="dot">·</span> {bucketLabels[e.bucket]}
                   </p>
+                  {e.spread ? (
+                    <p>
+                      {e.spread.kind === "prepaid" ? "Prepaid" : "Depreciated"}{" "}
+                      · {e.spread.months} months ·{" "}
+                      {money(Math.round(e.amount / e.spread.months))}/month
+                    </p>
+                  ) : null}
                   <div className="tags">
                     {e.tags.map((t) => (
                       <button key={t} onClick={() => setSearch("#" + t)}>

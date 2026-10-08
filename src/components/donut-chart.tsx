@@ -1,3 +1,6 @@
+"use client";
+import { useState } from "react";
+import { ringSlice } from "@/lib/chart-interaction";
 import { money } from "@/lib/budget";
 import type { ChartSlice } from "@/lib/chart-data";
 const colors = [
@@ -17,9 +20,18 @@ export default function DonutChart({
 }: {
   slices: ChartSlice[];
   label: string;
-  onSelect?: (label:string)=>void;
-  isSelectable?: (label:string)=>boolean;
+  onSelect?: (label: string) => void;
+  isSelectable?: (label: string) => boolean;
 }) {
+  const [active, setActive] = useState<number | null>(null);
+  function ring(event: React.PointerEvent<HTMLDivElement>) {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    return ringSlice(
+      (event.clientX - bounds.left - bounds.width / 2) / (bounds.width / 2),
+      (event.clientY - bounds.top - bounds.height / 2) / (bounds.height / 2),
+      slices.map((s) => s.amount),
+    );
+  }
   const positive = slices.filter((s) => s.amount > 0);
   const total = positive.reduce((n, s) => n + s.amount, 0);
   let offset = 0;
@@ -35,44 +47,85 @@ export default function DonutChart({
       <div
         className="donut"
         role="img"
+        onPointerMove={(e) => setActive(ring(e))}
+        onPointerLeave={() => setActive(null)}
+        onPointerDown={(e) => {
+          const index = ring(e);
+          setActive(index);
+          if (
+            index !== null &&
+            onSelect &&
+            (isSelectable?.(slices[index].label) ?? true)
+          )
+            onSelect(slices[index].label);
+        }}
         aria-label={`${label}: ${slices.map((s) => `${s.label} ${money(s.amount)}`).join(", ")}`}
         style={{
           background: total ? `conic-gradient(${gradient})` : "var(--line)",
         }}
       >
         <div>
-          <span>{label}</span>
-          <strong>{money(slices.reduce((n, s) => n + s.amount, 0))}</strong>
+          <span>{active === null ? label : slices[active].label}</span>
+          <strong>
+            {money(
+              active === null
+                ? slices.reduce((n, s) => n + s.amount, 0)
+                : slices[active].amount,
+            )}
+          </strong>
         </div>
       </div>
       <ul className="donut-legend">
-        {slices.map((slice) => (
-          <li key={slice.label}>
-            {onSelect && (isSelectable?.(slice.label)??true)?<button type="button" className="chart-category-button" onClick={()=>onSelect(slice.label)} aria-label={"View "+slice.label+" transactions, "+money(slice.amount)}>
-            <span>
-              <i
-                style={{
-                  background:
-                    colors[Math.max(0, slices.indexOf(slice)) % colors.length],
-                }}
-              />
-              {slice.label}
-            </span>
-            <span className="chart-category-amount"><strong>{money(slice.amount)}</strong><b aria-hidden="true">›</b></span>
-            </button>:<>
-            <span>
-              <i
-                style={{
-                  background:
-                    colors[Math.max(0, slices.indexOf(slice)) % colors.length],
-                }}
-              />
-              {slice.label}
-            </span>
-            <strong>{money(slice.amount)}</strong>
-            </>}
-          </li>
-        ))}
+        {slices.map((slice, index) => {
+          const selectable = Boolean(
+            onSelect && (isSelectable?.(slice.label) ?? true),
+          );
+          const content = (
+            <>
+              <span>
+                <i style={{ background: colors[index % colors.length] }} />
+                {slice.label}
+              </span>
+              <span className="chart-category-amount">
+                <strong>{money(slice.amount)}</strong>
+                <b
+                  className={selectable ? "" : "legend-spacer"}
+                  aria-hidden="true"
+                >
+                  ›
+                </b>
+              </span>
+            </>
+          );
+          return (
+            <li
+              key={slice.label}
+              data-active={active === index}
+              onPointerEnter={() => setActive(index)}
+              onPointerLeave={() => setActive(null)}
+            >
+              {selectable ? (
+                <button
+                  type="button"
+                  className="chart-legend-row chart-category-button"
+                  onFocus={() => setActive(index)}
+                  onBlur={() => setActive(null)}
+                  onClick={() => onSelect?.(slice.label)}
+                  aria-label={
+                    "View " +
+                    slice.label +
+                    " transactions, " +
+                    money(slice.amount)
+                  }
+                >
+                  {content}
+                </button>
+              ) : (
+                <div className="chart-legend-row">{content}</div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

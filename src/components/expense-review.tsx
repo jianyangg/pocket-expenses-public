@@ -3,6 +3,8 @@ import { useRef, useState } from "react";
 import { buckets, money, type Expense, type Bucket } from "@/lib/budget";
 import { reviewQueue, daysBefore, swipeAction } from "@/lib/review-queue";
 import { normalizeTags } from "@/lib/entry-tags";
+import SpreadControls from "./spread-controls";
+import type { ExpenseSpread } from "@/lib/expense-schedule";
 import TagPicker from "./tag-picker";
 const labels: Record<Bucket, string> = {
   discretionary: "Spending",
@@ -164,6 +166,9 @@ function ReviewCard({
   const [tags, setTags] = useState(expense.tags);
   const [query, setQuery] = useState("");
   const [bucket, setBucket] = useState(expense.bucket);
+  const [spread, setSpread] = useState<ExpenseSpread | null>(
+    expense.spread ?? null,
+  );
   const [drag, setDrag] = useState(0);
   const pointer = useRef<{ id: number; x: number; y: number } | null>(null);
   const [options, setOptions] = useState(false);
@@ -172,6 +177,7 @@ function ReviewCard({
     await onFinish(
       {
         ...expense,
+        spread,
         bucket: value,
         tags: [
           ...new Set([
@@ -188,6 +194,7 @@ function ReviewCard({
     await onFinish(
       {
         ...expense,
+        spread,
         bucket,
         tags: [...new Set([...tags, ...normalizeTags(query)])],
       },
@@ -287,6 +294,12 @@ function ReviewCard({
               if (values.includes("groceries")) setBucket("groceries");
             }}
             onQuery={setQuery}
+          />
+          <SpreadControls
+            value={spread}
+            onChange={setSpread}
+            amount={expense.amount}
+            disabled={disabled}
           />
         </fieldset>
       </article>

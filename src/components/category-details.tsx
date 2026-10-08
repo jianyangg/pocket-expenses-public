@@ -81,6 +81,13 @@ export default function CategoryDetails({
                         .join(" ")
                     : ""}
                 </small>
+                {e.spread ? (
+                  <small>
+                    {e.spread.kind === "prepaid" ? "Prepaid" : "Depreciated"} ·{" "}
+                    {e.spread.months} months ·{" "}
+                    {money(Math.round(e.amount / e.spread.months))}/month
+                  </small>
+                ) : null}
               </div>
               <strong className={e.amount < 0 ? "transaction-refund" : ""}>
                 {money(e.amount)}

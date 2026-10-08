@@ -2,7 +2,7 @@ import type { Budget, Expense } from "./budget";
 export function expenseCategory(e: Expense) {
   const text = (e.description + " " + e.tags.join(" ")).toLowerCase();
   if (e.bucket === "investment") return "investments";
-  if (e.bucket === "fixed") return "setup";
+  if (e.bucket === "fixed" && !e.spread) return "setup";
   if (e.bucket === "groceries") return "groceries";
   if (
     e.tags.some((tag) =>

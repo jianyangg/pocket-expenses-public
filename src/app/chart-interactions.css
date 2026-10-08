@@ -1,0 +1,123 @@
+.donut-legend li {
+  display: block;
+}
+.donut-legend .chart-legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 400;
+  text-align: left;
+}
+.chart-legend-row > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+.chart-legend-row .chart-category-amount {
+  display: grid;
+  grid-template-columns: auto 10px;
+  gap: 8px;
+  align-items: center;
+}
+.chart-category-amount b {
+  width: 10px;
+}
+.chart-legend-row .legend-spacer {
+  visibility: hidden;
+}
+.allocation-surface .donut-legend {
+  gap: 0;
+}
+.donut-legend li[data-active="true"] .chart-legend-row {
+  background: #f2f6ff;
+}
+.donut > div {
+  pointer-events: none;
+}
+.interactive-trend {
+  position: relative;
+  padding-top: 28px;
+}
+.trend-readout {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 22px;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.trend-readout strong {
+  color: #007aff;
+  font-weight: 600;
+}
+.interactive-trend .trend-chart {
+  touch-action: pan-y;
+  cursor: crosshair;
+  border-radius: 8px;
+}
+.trend-chart:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 3px;
+}
+.trend-surface .section-head {
+  margin-bottom: 8px;
+}
+.chart-axis {
+  margin-top: 8px;
+}
+.add-expense-button {
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.add-expense-button svg {
+  display: block;
+  flex-shrink: 0;
+}
+.spread-controls {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 4px;
+}
+.spread-controls summary {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 10px 0;
+  min-height: 40px;
+  cursor: pointer;
+}
+.spread-controls label {
+  font-size: 12px;
+  margin: 8px 0;
+}
+.spread-controls select,
+.spread-controls input {
+  font-size: 16px;
+}
+.spread-controls .hint {
+  margin: 8px 0;
+  font-size: 11px;
+}
+@media (hover: hover) {
+  .donut-legend button.chart-legend-row:hover {
+    background: #f2f6ff;
+  }
+  .add-expense-button:hover {
+    background: #0066da;
+  }
+}

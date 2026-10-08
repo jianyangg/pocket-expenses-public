@@ -180,7 +180,7 @@ export default function Tracker() {
           {view === "statements" ? (
             <FinancialStatements
               budget={budget}
-              expenses={expenses}
+              expenses={snapshot.expenses}
               month={month}
               today={today}
               settings={finance.settings}

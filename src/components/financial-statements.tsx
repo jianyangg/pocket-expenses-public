@@ -38,8 +38,8 @@ export default function FinancialStatements({
 }) {
   const [view, setView] = useState<ReportView>("profit");
   const i = inputsForMonth(settings, month);
-  const rows = financialReport(view, budget, expenses, i);
-  const p = financialStatements(budget, expenses, i);
+  const rows = financialReport(view, budget, expenses, i, month);
+  const p = financialStatements(budget, expenses, i, month);
   const [year, m] = month.split("-").map(Number);
   const end = new Date(Date.UTC(year, m, 0));
   const current = today.startsWith(month);

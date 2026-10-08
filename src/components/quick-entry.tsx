@@ -9,6 +9,8 @@ import {
 } from "@/lib/budget";
 import { useVisualViewport } from "@/lib/use-visual-viewport";
 import { formatAmountInput } from "@/lib/amount-input";
+import SpreadControls from "./spread-controls";
+import { validateSpread, type ExpenseSpread } from "@/lib/expense-schedule";
 import TagPicker from "./tag-picker";
 import { normalizeTags } from "@/lib/entry-tags";
 export const bucketLabels: Record<Bucket, string> = {
@@ -39,6 +41,9 @@ export default function QuickEntry({
   const [name, setName] = useState(editing?.description ?? "");
   const [tags, setTags] = useState<string[]>(editing?.tags ?? []);
   const [tagQuery, setTagQuery] = useState("");
+  const [spread, setSpread] = useState<ExpenseSpread | null>(
+    editing?.spread ?? null,
+  );
   const [refund, setRefund] = useState((editing?.amount ?? 0) < 0);
   const amountRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -127,14 +132,18 @@ export default function QuickEntry({
       const chosenTags = [...new Set([...tags, ...normalizeTags(tagQuery)])];
       if (chosenTags.length > 20 || chosenTags.some((t) => t.length > 40))
         throw new Error("Use up to 20 tags, each under 40 characters.");
-      const success = await onSave({
+      const entry: Expense = {
+        ...editing,
         id: editing?.id ?? crypto.randomUUID(),
         amount: parsed.amount,
         description: name.trim(),
         tags: chosenTags,
         bucket: chosenTags.includes("groceries") ? "groceries" : bucket,
         date,
-      });
+        spread,
+      };
+      validateSpread(entry);
+      const success = await onSave(entry);
       if (!success) {
         setError("Could not save. Please try again.");
         return;
@@ -144,6 +153,7 @@ export default function QuickEntry({
       setTags([]);
       setTagQuery("");
       setRefund(false);
+      setSpread(null);
       setBucket("discretionary");
       setDate(todayInNewYork());
       setOpen(false);
@@ -168,7 +178,15 @@ export default function QuickEntry({
           amountRef.current?.focus();
         }}
       >
-        +
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26">
+          <path
+            d="M12 5v14M5 12h14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.8"
+            strokeLinecap="square"
+          />
+        </svg>
       </button>
       <dialog
         ref={dialogRef}
@@ -256,6 +274,12 @@ export default function QuickEntry({
                 if (next.includes("groceries")) setBucket("groceries");
               }}
               onQuery={setTagQuery}
+            />
+            <SpreadControls
+              value={spread}
+              onChange={setSpread}
+              amount={Math.round(Number(amount) * 100)}
+              disabled={busy}
             />
             <details className="expense-extra-options">
               <summary>Date, category or refund</summary>

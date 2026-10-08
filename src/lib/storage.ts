@@ -1,3 +1,4 @@
+import { validateSpread } from "./expense-schedule";
 import { buckets, defaultBudget, type Budget, type Expense } from "./budget";
 export type Snapshot = {
   version: 1;
@@ -45,6 +46,7 @@ export function validateSnapshot(input: unknown): Snapshot {
       !isDate(e.date)
     )
       throw new Error("The export contains an invalid or duplicate expense.");
+    validateSpread(e);
     ids.add(e.id);
   }
   for (const [month, b] of Object.entries(s.budgets)) {

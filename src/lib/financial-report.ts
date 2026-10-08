@@ -1,3 +1,4 @@
+import { scheduleLedger } from "./expense-schedule";
 import type { Budget, Expense } from "./budget";
 import { expenseCategory } from "./money-flow";
 import { financialStatements, type StatementInputs } from "./statements";
@@ -17,8 +18,9 @@ export function financialReport(
   b: Budget,
   expenses: Expense[],
   i: StatementInputs,
+  month?: string,
 ): ReportRow[] {
-  const p = financialStatements(b, expenses, i);
+  const p = financialStatements(b, expenses, i, month);
   const account = (label: string, value: number): ReportRow => ({
     label,
     value,
@@ -35,8 +37,18 @@ export function financialReport(
     value,
     kind: "total",
   });
+  const recognition = scheduleLedger(
+    expenses,
+    month ?? expenses[0]?.date.slice(0, 7) ?? "2000-01",
+  );
+  const recognized = [
+    ...expenses.filter(
+      (e) => (!month || e.date.startsWith(month)) && !e.spread,
+    ),
+    ...recognition.recognized,
+  ];
   const amount = (category: string) =>
-    expenses
+    recognized
       .filter((e) => expenseCategory(e) === category)
       .reduce((n, e) => n + e.amount, 0);
   if (view === "profit")
@@ -58,7 +70,7 @@ export function financialReport(
       account("Depreciation of setup assets", -p.depreciation),
       subtotal(
         "Total expenses",
-        -p.spending - p.accrualAdjustment - p.depreciation,
+        -p.expenseSpending - p.accrualAdjustment - p.depreciation,
       ),
       total("Profit / (loss) for the period", p.netIncome),
     ];
@@ -86,13 +98,14 @@ export function financialReport(
     section("Assets"),
     account("Cash and cash equivalents", p.closingCash),
     account("Income receivable", p.receivable),
-    subtotal("Total current assets", p.closingCash + p.receivable),
-    account("Investments at cost", p.closingInvestments),
-    account("Setup assets at cost", i.setupCost + p.setupPurchases),
-    account(
-      "Less: accumulated depreciation",
-      -i.openingDepreciation - p.depreciation,
+    account("Prepaid expenses", p.prepaidBalance),
+    subtotal(
+      "Total current assets",
+      p.closingCash + p.receivable + p.prepaidBalance,
     ),
+    account("Investments at cost", p.closingInvestments),
+    account("Setup assets at cost", p.assetCost),
+    account("Less: accumulated depreciation", -p.accumulatedDepreciation),
     subtotal("Setup assets, net", p.netSetup),
     total("Total assets", p.assets),
     section("Liabilities"),

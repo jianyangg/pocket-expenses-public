@@ -10,6 +10,7 @@ export const buckets = [
 export type Bucket = (typeof buckets)[number];
 export type Expense = {
   reviewed?: boolean;
+  spread?: import("./expense-schedule").ExpenseSpread | null;
   id: string;
   amount: number;
   description: string;
