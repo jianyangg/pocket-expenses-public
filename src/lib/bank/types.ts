@@ -21,6 +21,7 @@ export type BankStatus = {
   configured: boolean;
   connected: boolean;
   lastSynced: string | null;
+  bankUpdatedAt?: string | null;
   reviews: { id: string; description: string; amount: number; date: string }[];
 };
 export type TransactionRecord = {

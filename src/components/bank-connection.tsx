@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import BankSyncSummary from "./bank-sync-summary";
 import Script from "next/script";
 import { bankAction, useBankLink } from "@/lib/bank/use-bank-link";
 import { money } from "@/lib/budget";
@@ -94,17 +95,12 @@ export default function BankConnection({
         <>
           {state.connected ? (
             <>
-              <p className="hint">
-                {state.lastSynced
-                  ? `Updated ${new Date(state.lastSynced).toLocaleString()}`
-                  : "Waiting for bank transactions…"}{" "}
-                · bank updates can be delayed
-              </p>
+              <BankSyncSummary state={state} />
               <button
                 disabled={busy}
                 onClick={() => void action({ action: "sync" })}
               >
-                Sync
+                {busy ? "Checking…" : "Check now"}
               </button>{" "}
               <button
                 className="quiet"

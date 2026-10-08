@@ -1,3 +1,5 @@
+import { bankFreshness } from "./freshness";
+import { unseal } from "./crypto";
 import { database } from "../database";
 import type { Credentials } from "./client";
 import type { BankStatus, Connection, TransactionRecord } from "./types";
@@ -51,7 +53,8 @@ export async function records(
   )) as TransactionRecord[];
 }
 export async function status(userId: string): Promise<BankStatus> {
-  const configured = Boolean(await credentials(userId));
+  const config = await credentials(userId);
+  const configured = Boolean(config);
   const items = await connections(userId);
   const rows = await bankQuery(
     userId,
@@ -62,6 +65,10 @@ export async function status(userId: string): Promise<BankStatus> {
     configured,
     connected: items.length > 0,
     lastSynced: items[0]?.last_synced || null,
+    bankUpdatedAt:
+      config && items[0]
+        ? await bankFreshness(config, unseal(items[0].token, signingKey()))
+        : null,
     reviews: rows as BankStatus["reviews"],
   };
 }
