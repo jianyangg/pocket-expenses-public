@@ -741,3 +741,35 @@ header {
 body:has(.money-settings-sheet[open]) {
   overflow: hidden;
 }
+
+.toolbar .month-picker {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+}
+.toolbar .month-picker input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+.toolbar .month-picker input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.toolbar .month-picker:focus-within {
+  outline: 3px solid #88b8ff;
+  outline-offset: 3px;
+}

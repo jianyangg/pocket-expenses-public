@@ -5,6 +5,8 @@ const paths = {
   review: "m4 12 5 5L20 6M4 4h6M4 8h3",
   statements: "M4 20h16M7 16V9m5 7V4m5 12v-5",
   budget: "M3 6h18v14H3V6Zm0 4h18m-5 5h2M6 3h12",
+  calendar:
+    "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm2-2v4m10-4v4M3 11h18M7 15h2m6 0h2",
   settings: "M4 7h16M4 17h16M8 4v6M16 14v6",
 };
 export default function InterfaceIcon({

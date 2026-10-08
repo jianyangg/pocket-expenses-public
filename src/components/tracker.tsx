@@ -76,10 +76,12 @@ export default function Tracker() {
           >
             <InterfaceIcon name="settings" />
           </button>
-          <label className="month-picker">
+          <label className="month-picker icon-button" title="Choose month">
+            <InterfaceIcon name="calendar" />
             <span className="sr-only">Month</span>
             <input
               type="month"
+              aria-label={"Choose month, currently " + monthName}
               value={month}
               onChange={(e) => {
                 if (e.target.value) {
