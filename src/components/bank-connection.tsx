@@ -8,6 +8,8 @@ export default function BankConnection({ onChange }: { onChange: () => void }) {
   const [state, setState] = useState<BankStatus>();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pendingLink, setPendingLink] = useState(false);
+  useEffect(() => { setPendingLink(Boolean(sessionStorage.getItem("pocket-bank-link"))); }, []);
   const load = useCallback(async () => {
     try {
       const response = await fetch("/api/bank", { cache: "no-store" });
@@ -25,6 +27,8 @@ export default function BankConnection({ onChange }: { onChange: () => void }) {
   });
   useEffect(() => {
     void load();
+    window.addEventListener("focus", load);
+    return () => window.removeEventListener("focus", load);
   }, [load]);
   useEffect(() => {
     if (!state?.connected) return;
@@ -121,7 +125,7 @@ export default function BankConnection({ onChange }: { onChange: () => void }) {
               disabled={!link.ready || link.busy}
               onClick={() => void link.open()}
             >
-              Connect bank
+              {pendingLink ? "Resume connection" : "Connect bank"}
             </button>
           )}
           {state.reviews.length ? (
@@ -176,6 +180,7 @@ export default function BankConnection({ onChange }: { onChange: () => void }) {
           Bank sync needs Plaid credentials in the server settings.
         </p>
       )}
+      {!state?.connected && pendingLink ? <button className="quiet" disabled={!link.ready || link.busy} onClick={() => { sessionStorage.removeItem("pocket-bank-link"); sessionStorage.removeItem("pocket-bank-update"); setPendingLink(false); void link.open(); }}>Start over</button> : null}
       {error || link.error ? (
         <p className="error" role="alert">
           {error || link.error}

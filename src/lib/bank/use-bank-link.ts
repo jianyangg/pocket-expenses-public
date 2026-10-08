@@ -36,7 +36,7 @@ export function useBankLink(onConnected: () => void) {
     try {
       let token: string;
       let update = false;
-      if (resume) {
+      if (resume || sessionStorage.getItem("pocket-bank-link")) {
         token = sessionStorage.getItem("pocket-bank-link") || "";
         update = sessionStorage.getItem("pocket-bank-update") === "true";
         if (!token)
@@ -53,7 +53,7 @@ export function useBankLink(onConnected: () => void) {
       handler.current?.destroy();
       handler.current = (window as PlaidWindow).Plaid!.create({
         token,
-        ...(resume ? { receivedRedirectUri: window.location.href } : {}),
+        ...(resume && new URLSearchParams(window.location.search).has("oauth_state_id") ? { receivedRedirectUri: window.location.href } : {}),
         onSuccess: async (publicToken) => {
           try {
             if (!update) await bankAction({ action: "exchange", publicToken });
@@ -71,10 +71,7 @@ export function useBankLink(onConnected: () => void) {
         },
         onExit: (exitError) => {
           setBusy(false);
-          if (exitError)
-            setError(
-              exitError.display_message || "Bank connection was not completed.",
-            );
+          setError(exitError?.display_message || "Connection is not saved yet. Tap Resume connection to finish Plaid’s final confirmation.");
         },
       });
       handler.current.open();
