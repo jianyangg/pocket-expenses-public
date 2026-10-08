@@ -1049,3 +1049,26 @@ details on demand. */
 .bank-review button {
   padding: 8px 12px;
 }
+
+.review-panel { max-width: 560px; margin: 0 auto; overflow-x: clip; }
+.review-presets, .review-dates, .review-buckets, .review-actions { display: flex; gap: 8px; }
+.review-presets { flex-wrap: wrap; margin-bottom: 12px; }
+.review-dates label { flex: 1; min-width: 0; font-size: 12px; color: var(--muted); }
+.review-dates input { width: 100%; min-width: 0; display: block; margin-top: 5px; }
+.review-filter { display: flex; align-items: center; gap: 8px; margin: 14px 0; font-size: 13px; }
+.review-filter input { width: auto; }
+.review-card { position: relative; border-radius: 24px; margin-bottom: 12px; box-shadow: 0 12px 32px #20372c12; }
+.review-swipe-zone { touch-action: pan-y; cursor: grab; user-select: none; padding: 12px 0 16px; }
+.review-swipe-zone h2 { font-size: 24px; overflow-wrap: anywhere; margin: 12px 0; }
+.review-date { font-size: 13px; color: var(--muted); }
+.review-amount { font-size: 40px; letter-spacing: -1px; }
+.review-card fieldset { border: 0; padding: 0; min-width: 0; }
+.review-buckets { flex-wrap: wrap; margin-bottom: 12px; }
+.review-buckets button { flex: 1; white-space: nowrap; padding: 10px; font-size: 13px; background: var(--paper); color: var(--ink); }
+.review-buckets button[aria-pressed="true"] { background: var(--green); color: white; }
+.review-card details { margin-bottom: 14px; }
+.review-card select { width: 100%; margin-top: 8px; }
+.review-card .tag-suggestions { max-height: 130px; overflow-y: auto; }
+.review-actions button { flex: 1; min-height: 48px; }
+.review-empty { text-align: center; }
+@media (prefers-reduced-motion: reduce) { .review-card { transform: none !important; } }

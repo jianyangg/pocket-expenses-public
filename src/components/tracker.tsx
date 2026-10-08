@@ -9,6 +9,7 @@ import QuickEntry from "./quick-entry";
 import BudgetSettings from "./budget-settings";
 import ExpenseList from "./expense-list";
 import Analysis from "./analysis";
+import ExpenseReview from "./expense-review";
 import BankConnection from "./bank-connection";
 
 export default function Tracker() {
@@ -34,7 +35,7 @@ export default function Tracker() {
     deleteEntry,
     importFile,
   } = useTracker();
-  const [view, setView] = useState<"overview" | "activity" | "budget">(
+  const [view, setView] = useState<"overview" | "activity" | "review" | "budget">(
     "overview",
   );
   const importInput = useRef<HTMLInputElement>(null);
@@ -163,7 +164,7 @@ export default function Tracker() {
             onCancel={editing ? () => setEditing(undefined) : undefined}
           />
           <nav className="dashboard-tabs" aria-label="Dashboard sections">
-            {(["overview", "activity", "budget"] as const).map((tab) => (
+            {(["overview", "activity", "review", "budget"] as const).map((tab) => (
               <button
                 key={tab}
                 aria-pressed={view === tab}
@@ -173,13 +174,14 @@ export default function Tracker() {
                   ? "Overview"
                   : tab === "activity"
                     ? "Expenses"
-                    : "Budget"}
+                    : tab === "review" ? "Categorize" : "Budget"}
               </button>
             ))}
           </nav>
           {view === "overview" ? (
             <Analysis expenses={expenses} budget={budget} />
           ) : null}
+          {view === "review" ? <ExpenseReview expenses={snapshot.expenses} today={today} busy={busy} onSave={add} /> : null}
           <div className="content-grid">
             {view === "activity" ? (
               <ExpenseList
