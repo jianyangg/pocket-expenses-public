@@ -48,6 +48,8 @@ export function validateSnapshot(input: unknown): Snapshot {
     ids.add(e.id);
   }
   for (const [month, b] of Object.entries(s.budgets)) {
+    if (b && typeof b === "object" && b.insurance === undefined)
+      b.insurance = 0;
     if (
       !/^\d{4}-(0[1-9]|1[0-2])$/.test(month) ||
       !b ||

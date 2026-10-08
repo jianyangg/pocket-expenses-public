@@ -5,8 +5,13 @@ export function expenseCategory(e: Expense) {
   if (e.bucket === "fixed") return "setup";
   if (e.bucket === "groceries") return "groceries";
   if (
-    e.bucket === "bill" &&
-    /\b(rent|utilities|utility|electricity|internet|coned|con ed)\b/.test(text)
+    e.tags.some((tag) =>
+      ["rent", "utilities", "insurance"].includes(tag.toLowerCase()),
+    ) ||
+    (e.bucket === "bill" &&
+      /\b(rent|utilities|utility|electricity|internet|coned|con ed|insurance)\b/.test(
+        text,
+      ))
   )
     return "essential";
   if (
@@ -28,7 +33,11 @@ export function moneyFlow(
   includeSetup = false,
 ) {
   const starting =
-    b.income - b.rent - b.utilities - (includeSetup ? b.depreciation : 0);
+    b.income -
+    b.rent -
+    b.utilities -
+    b.insurance -
+    (includeSetup ? b.depreciation : 0);
   const totals = {
     groceries: 0,
     subscriptions: 0,

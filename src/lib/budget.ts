@@ -21,6 +21,7 @@ export type Budget = {
   income: number;
   rent: number;
   utilities: number;
+  insurance: number;
   subscriptions: number;
   transit: number;
   groceries: number;
@@ -30,6 +31,7 @@ export type Budget = {
   investing: number;
 };
 export const defaultBudget: Budget = {
+  insurance: 0,
   income: 0,
   rent: 0,
   utilities: 0,
@@ -94,7 +96,8 @@ export function calculatePlan(
   const rows = expenses.filter((e) => e.date.startsWith(month));
   const sum = (bucket: Bucket) =>
     rows.filter((e) => e.bucket === bucket).reduce((n, e) => n + e.amount, 0);
-  const fixed = b.rent + b.utilities + b.subscriptions + b.transit;
+  const fixed =
+    b.rent + b.utilities + b.insurance + b.subscriptions + b.transit;
   const setAsides = b.refills + b.renewals;
   const discretionaryBudget =
     b.income - fixed - setAsides - b.groceries - b.depreciation - b.investing;

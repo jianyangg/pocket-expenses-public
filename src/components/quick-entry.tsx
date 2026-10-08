@@ -49,7 +49,16 @@ export default function QuickEntry({
   const existingTags = [...counts]
     .sort((a, b) => b[1] - a[1])
     .map(([tag]) => tag);
-  for (const tag of ["food", "groceries", "clothes", "shopping"])
+  for (const tag of [
+    "food",
+    "groceries",
+    "clothes",
+    "shopping",
+    "utilities",
+    "insurance",
+    "transit",
+    "subscriptions",
+  ])
     if (!counts.has(tag)) existingTags.push(tag);
   const recentNames = [
     ...new Set(

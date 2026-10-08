@@ -23,6 +23,8 @@ export function inferCategory(expense: Expense, history: Expense[]): Expense {
       tags: previous.tags.filter((t) => t !== "chase"),
     };
   const text = merchant(expense.description);
+  if (/\binsurance\b/.test(text))
+    return { ...expense, bucket: "bill", tags: ["insurance"] };
   if (/\b(coned|con ed|consolidated edison|electricity|internet)\b/.test(text))
     return { ...expense, bucket: "bill", tags: ["utilities"] };
   if (/\b(mta|subway|metrocard)\b/.test(text))

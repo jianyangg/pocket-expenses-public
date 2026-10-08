@@ -37,7 +37,7 @@ export default function FinancialStatements({
           { label: "Earned income", value: p.earnings },
           { label: "Recorded living expenses", value: -p.spending },
           {
-            label: "Rent & utilities accrued but not recorded paid",
+            label: "Essential bills accrued but not recorded paid",
             value: -p.accrualAdjustment,
           },
           { label: "Depreciation", value: -p.depreciation },
@@ -74,7 +74,7 @@ export default function FinancialStatements({
             { label: "Total assets", value: p.assets, total: true },
             { label: "Opening debts", value: i.openingDebt },
             {
-              label: "Unpaid rent & utilities · model",
+              label: "Unpaid essential bills · model",
               value: p.accrualAdjustment,
             },
             {

@@ -1,13 +1,13 @@
 import { money } from "@/lib/budget";
 import type { ChartSlice } from "@/lib/chart-data";
 const colors = [
-  "#285c46",
-  "#87ac91",
-  "#d5b479",
-  "#7c91b1",
-  "#b292b0",
-  "#c68162",
-  "#a9b0a4",
+  "#34c759",
+  "#ff9f0a",
+  "#af52de",
+  "#5ac8fa",
+  "#5856d6",
+  "#007aff",
+  "#8e8e93",
 ];
 export default function DonutChart({
   slices,
@@ -23,7 +23,7 @@ export default function DonutChart({
     .map((slice, index) => {
       const start = offset;
       offset += (slice.amount / total) * 100;
-      return `${colors[index % colors.length]} ${start}% ${offset}%`;
+      return `${colors[Math.max(0, slices.indexOf(slice)) % colors.length]} ${start}% ${offset}%`;
     })
     .join(",");
   return (
@@ -48,9 +48,7 @@ export default function DonutChart({
               <i
                 style={{
                   background:
-                    colors[
-                      Math.max(0, positive.indexOf(slice)) % colors.length
-                    ],
+                    colors[Math.max(0, slices.indexOf(slice)) % colors.length],
                 }}
               />
               {slice.label}

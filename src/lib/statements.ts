@@ -36,11 +36,20 @@ export function financialStatements(
     .filter(
       (e) =>
         expenseCategory(e) === "essential" &&
-        !/\brent\b/i.test(e.description + " " + e.tags.join(" ")),
+        !/\b(rent|insurance)\b/i.test(e.description + " " + e.tags.join(" ")),
+    )
+    .reduce((n, e) => n + e.amount, 0);
+  const insurancePaid = rows
+    .filter(
+      (e) =>
+        expenseCategory(e) === "essential" &&
+        /\binsurance\b/i.test(e.description + " " + e.tags.join(" ")),
     )
     .reduce((n, e) => n + e.amount, 0);
   const accrualAdjustment =
-    Math.max(0, b.rent - rentPaid) + Math.max(0, b.utilities - utilitiesPaid);
+    Math.max(0, b.rent - rentPaid) +
+    Math.max(0, b.utilities - utilitiesPaid) +
+    Math.max(0, b.insurance - insurancePaid);
   const depreciation = Math.min(
     b.depreciation,
     Math.max(0, i.setupCost - i.openingDepreciation + setupPurchases),

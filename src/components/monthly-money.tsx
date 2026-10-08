@@ -1,97 +1,134 @@
 import { money, type Budget, type Expense } from "@/lib/budget";
 import { moneyFlow } from "@/lib/money-flow";
+import DonutChart from "./donut-chart";
+import DailyBudget from "./daily-budget";
 export default function MonthlyMoney({
   budget,
   expenses,
   includeSetup,
-  onSettings,
+  month,
+  today,
 }: {
   budget: Budget;
   expenses: Expense[];
   includeSetup: boolean;
-  onSettings: () => void;
+  month: string;
+  today: string;
 }) {
   const p = moneyFlow(budget, expenses, includeSetup);
-  const parts = [
-    { label: "Groceries", amount: p.groceries, color: "#6c9471" },
-    { label: "Shopping & other", amount: p.shopping, color: "#a4b1c4" },
-    { label: "Subscriptions", amount: p.subscriptions, color: "#a398ba" },
-    { label: "Transit", amount: p.transit, color: "#92b9c1" },
-    { label: "Investing", amount: p.investments, color: "#c9b183" },
-    { label: "Available", amount: Math.max(0, p.remaining), color: "#275745" },
+  const spent =
+    p.groceries + p.shopping + p.subscriptions + p.transit + p.investments;
+  const slices = [
+    { label: "Groceries", amount: p.groceries },
+    { label: "Shopping & dining", amount: p.shopping },
+    { label: "Subscriptions", amount: p.subscriptions },
+    { label: "Transit", amount: p.transit },
+    { label: "Investing", amount: p.investments },
+    { label: "Available", amount: Math.max(0, p.remaining) },
   ];
-  const total = parts.reduce((n, s) => n + Math.max(0, s.amount), 0) || 1;
+  const groceryProgress =
+    budget.groceries > 0
+      ? Math.max(0, Math.min(100, (p.groceries / budget.groceries) * 100))
+      : 0;
   return (
-    <section className="panel money-dashboard">
-      <div className="money-title">
-        <span>Available this month</span>
-        <button
-          className="quiet"
-          aria-label="Money view settings"
-          onClick={onSettings}
+    <section className="money-overview">
+      <div className="available-hero">
+        <p className="available-label">Available to spend or invest</p>
+        <strong
+          className={"available-amount " + (p.remaining < 0 ? "negative" : "")}
         >
-          Settings
-        </button>
-      </div>
-      <strong
-        className={"money-headline " + (p.remaining < 0 ? "negative" : "")}
-      >
-        {money(p.remaining)}
-      </strong>
-      <div
-        className="money-river"
-        role="img"
-        aria-label={parts
-          .map((s) => s.label + " " + money(s.amount))
-          .join(", ")}
-      >
-        {parts
-          .filter((s) => s.amount > 0)
-          .map((s) => (
-            <div
-              key={s.label}
-              style={{
-                flexBasis: `${(s.amount / total) * 100}%`,
-                background: s.color,
-              }}
-            />
-          ))}
-      </div>
-      <div className="money-categories">
-        {parts.slice(0, 5).map((s) => (
-          <div key={s.label}>
-            <span>
-              <i style={{ background: s.color }} />
-              {s.label}
-            </span>
-            <strong>{money(s.amount)}</strong>
-            {s.label === "Investing" ? (
-              <small>{money(budget.investing)} target</small>
-            ) : s.label === "Subscriptions" ? (
-              <small>{money(budget.subscriptions)} planned</small>
-            ) : null}
+          {money(p.remaining)}
+        </strong>
+        <div className="summary-balances">
+          <div>
+            <span>Groceries left</span>
+            <strong>{money(budget.groceries - p.groceries)}</strong>
           </div>
-        ))}
+          <div>
+            <span>Discretionary left</span>
+            <strong
+              className={
+                p.remaining - Math.max(0, budget.groceries - p.groceries) < 0
+                  ? "negative"
+                  : ""
+              }
+            >
+              {money(p.remaining - Math.max(0, budget.groceries - p.groceries))}
+            </strong>
+          </div>
+        </div>
+        <details className="income-disclosure">
+          <summary>Income & deductions</summary>
+          <div className="income-flow">
+            <div>
+              <span>Income</span>
+              <strong>{money(budget.income)}</strong>
+            </div>
+            <span className="flow-operation">−</span>
+            <div>
+              <span>Rent</span>
+              <strong>{money(budget.rent)}</strong>
+            </div>
+            <span className="flow-operation">−</span>
+            <div>
+              <span>Utilities</span>
+              <strong>{money(budget.utilities)}</strong>
+            </div>
+            <span className="flow-operation">−</span>
+            <div>
+              <span>Insurance</span>
+              <strong>{money(budget.insurance)}</strong>
+            </div>
+            {includeSetup ? (
+              <>
+                <span className="flow-operation">−</span>
+                <div>
+                  <span>Setup / 9</span>
+                  <strong>{money(budget.depreciation)}</strong>
+                </div>
+              </>
+            ) : null}
+            <span className="flow-operation">=</span>
+            <div className="flow-result">
+              <span>Before spending</span>
+              <strong>{money(p.starting)}</strong>
+            </div>
+          </div>
+        </details>
       </div>
-      <details className="money-baseline">
-        <summary>
-          Income & deductions <strong>{money(p.starting)}</strong>
-        </summary>
-        <dl className="math">
-          <dt>Monthly income</dt>
-          <dd>{money(budget.income)}</dd>
-          <dt>Rent</dt>
-          <dd>−{money(budget.rent)}</dd>
-          <dt>Utilities & internet</dt>
-          <dd>−{money(budget.utilities)}</dd>
-          {includeSetup ? (
-            <>
-              <dt>Setup depreciation</dt>
-              <dd>−{money(budget.depreciation)}</dd>
-            </>
-          ) : null}
-        </dl>
-      </details>
+      <DailyBudget
+        budget={budget}
+        expenses={expenses}
+        month={month}
+        today={today}
+        includeSetup={includeSetup}
+      />
+      <div className="allocation-surface">
+        <div className="section-head">
+          <h2>This month</h2>
+          <span className="allocation-spent">{money(spent)} used</span>
+        </div>
+        <DonutChart slices={slices} label="After essentials" />
+        <div className="grocery-budget">
+          <div>
+            <span>Groceries remaining</span>
+            <strong>{money(budget.groceries - p.groceries)}</strong>
+          </div>
+          <div
+            className="grocery-track"
+            role="progressbar"
+            aria-label="Grocery budget used"
+            aria-valuenow={groceryProgress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <span style={{ width: groceryProgress + "%" }} />
+          </div>
+          <small>
+            {money(p.groceries)} of {money(budget.groceries)}
+          </small>
+        </div>
+      </div>
     </section>
   );
 }

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { type Budget } from "@/lib/budget";
 const labels: Record<keyof Budget, string> = {
   income: "Monthly income",
+  insurance: "Insurance (USD)",
   rent: "Rent",
   utilities: "Utilities & internet",
   subscriptions: "Monthly subscriptions",

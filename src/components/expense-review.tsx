@@ -78,6 +78,9 @@ export default function ExpenseReview({
           <button
             key={days}
             className="quiet"
+            aria-pressed={
+              start === daysBefore(today, days - 1) && end === today
+            }
             onClick={() => {
               setStart(daysBefore(today, days - 1));
               setEnd(today);
@@ -87,31 +90,34 @@ export default function ExpenseReview({
           </button>
         ))}
       </div>
-      <div className="review-dates">
-        <label>
-          From
-          <input
-            type="date"
-            value={start}
-            onChange={(e) => setStart(e.target.value)}
-          />
-        </label>
-        <label>
-          To
-          <input
-            type="date"
-            value={end}
-            onChange={(e) => setEnd(e.target.value)}
-          />
-        </label>
-      </div>
+      <details className="review-custom">
+        <summary>Custom dates</summary>
+        <div className="review-dates">
+          <label>
+            From
+            <input
+              type="date"
+              value={start}
+              onChange={(e) => setStart(e.target.value)}
+            />
+          </label>
+          <label>
+            To
+            <input
+              type="date"
+              value={end}
+              onChange={(e) => setEnd(e.target.value)}
+            />
+          </label>
+        </div>
+      </details>
       <label className="review-filter">
         <input
           type="checkbox"
           checked={untagged}
           onChange={(e) => setUntagged(e.target.checked)}
         />{" "}
-        Only without tags
+        Only untagged
       </label>
       <div className="section-head">
         <span role="status">
@@ -137,8 +143,8 @@ export default function ExpenseReview({
         />
       ) : (
         <div className="panel review-empty">
-          <h2>{done.length ? "All done" : "No transactions"}</h2>
-          <p>Choose another date range to review more.</p>
+          <h2>{done.length ? "All done" : "All caught up"}</h2>
+          <p>Nothing to categorise in this range.</p>
         </div>
       )}
     </section>
@@ -231,18 +237,20 @@ function ReviewCard({
         <fieldset disabled={disabled} hidden={!options}>
           <legend className="sr-only">Categorize transaction</legend>
           <div className="review-buckets">
-            {["utilities", "transit", "subscriptions"].map((tag) => (
-              <button
-                type="button"
-                key={tag}
-                onClick={() => {
-                  setBucket("bill");
-                  setTags([tag]);
-                }}
-              >
-                {tag[0].toUpperCase() + tag.slice(1)}
-              </button>
-            ))}
+            {["utilities", "insurance", "transit", "subscriptions"].map(
+              (tag) => (
+                <button
+                  type="button"
+                  key={tag}
+                  onClick={() => {
+                    setBucket("bill");
+                    setTags([tag]);
+                  }}
+                >
+                  {tag[0].toUpperCase() + tag.slice(1)}
+                </button>
+              ),
+            )}
             {(["discretionary", "groceries", "bill"] as Bucket[]).map(
               (value) => (
                 <button

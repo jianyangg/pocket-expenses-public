@@ -7,12 +7,14 @@ import Login from "./login";
 import QuickEntry from "./quick-entry";
 import BudgetSettings from "./budget-settings";
 import ExpenseList from "./expense-list";
-import Analysis from "./analysis";
 import ExpenseReview from "./expense-review";
 import MonthlyMoney from "./monthly-money";
+import InterfaceIcon from "./interface-icon";
+import SpendingTrends from "./spending-trends";
+import { moneyFlow } from "@/lib/money-flow";
 import FinancialStatements from "./financial-statements";
 import { useFinancial } from "@/lib/use-financial";
-import BankConnection from "./bank-connection";
+import MoneySettings from "./money-settings";
 
 export default function Tracker() {
   const {
@@ -66,6 +68,14 @@ export default function Tracker() {
           pocket<span> / personal finances</span>
         </a>
         <div className="toolbar">
+          <button
+            className="icon-button"
+            aria-label="Settings"
+            aria-pressed={showMoneySettings}
+            onClick={() => setShowMoneySettings((v) => !v)}
+          >
+            <InterfaceIcon name="settings" />
+          </button>
           <label className="month-picker">
             <span className="sr-only">Month</span>
             <input
@@ -106,40 +116,14 @@ export default function Tracker() {
         </p>
       ) : (
         <>
-          <BankConnection onChange={refreshBank} visible={showMoneySettings} />
-          {showMoneySettings ? (
-            <section className="panel">
-              <div className="section-head">
-                <h2>Settings</h2>
-                <button
-                  className="quiet"
-                  onClick={() => setShowMoneySettings(false)}
-                >
-                  Done
-                </button>
-              </div>
-              <label className="review-filter">
-                <input
-                  type="checkbox"
-                  disabled={!finance.ready}
-                  checked={finance.settings.includeSetup}
-                  onChange={(e) =>
-                    void finance.save({
-                      ...finance.settings,
-                      includeSetup: e.target.checked,
-                    })
-                  }
-                />{" "}
-                Include setup depreciation
-              </label>
-              {finance.error ? <p className="error">{finance.error}</p> : null}
-            </section>
-          ) : null}
-          <MonthlyMoney
-            budget={budget}
-            expenses={expenses}
-            includeSetup={finance.settings.includeSetup}
-            onSettings={() => setShowMoneySettings((v) => !v)}
+          <MoneySettings
+            open={showMoneySettings}
+            onClose={() => setShowMoneySettings(false)}
+            onBankChange={refreshBank}
+            settings={finance.settings}
+            onSave={finance.save}
+            ready={finance.ready}
+            error={finance.error}
           />
           {view === "statements" ? (
             <FinancialStatements
@@ -176,8 +160,8 @@ export default function Tracker() {
             {(
               [
                 "overview",
-                "activity",
                 "review",
+                "activity",
                 "statements",
                 "budget",
               ] as const
@@ -187,23 +171,41 @@ export default function Tracker() {
                 aria-pressed={view === tab}
                 onClick={() => setView(tab)}
               >
+                <InterfaceIcon name={tab} />
                 {tab === "overview"
                   ? "Overview"
                   : tab === "activity"
                     ? "Expenses"
                     : tab === "review"
                       ? "Categorize"
-                      : "Budget"}
+                      : tab === "statements"
+                        ? "Statements"
+                        : "Budget"}
               </button>
             ))}
           </nav>
           {view === "overview" ? (
-            <Analysis
-              expenses={expenses}
-              budget={budget}
-              includeSetup={finance.settings.includeSetup}
-            />
+            <>
+              <MonthlyMoney
+                budget={budget}
+                expenses={expenses}
+                includeSetup={finance.settings.includeSetup}
+                month={month}
+                today={today}
+              />
+
+              <SpendingTrends
+                expenses={expenses}
+                month={month}
+                today={today}
+                starting={
+                  moneyFlow(budget, expenses, finance.settings.includeSetup)
+                    .starting
+                }
+              />
+            </>
           ) : null}
+
           {view === "review" ? (
             <ExpenseReview
               expenses={snapshot.expenses}
