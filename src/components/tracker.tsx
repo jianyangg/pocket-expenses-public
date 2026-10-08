@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
-import { calculatePlan, money } from "@/lib/budget";
 import { budgetForMonth, downloadSnapshot } from "@/lib/storage";
 import { authClient } from "@/lib/auth/client";
 import { useTracker } from "@/lib/use-tracker";
@@ -10,6 +9,7 @@ import BudgetSettings from "./budget-settings";
 import ExpenseList from "./expense-list";
 import Analysis from "./analysis";
 import ExpenseReview from "./expense-review";
+import MonthlyMoney from "./monthly-money";
 import BankConnection from "./bank-connection";
 
 export default function Tracker() {
@@ -50,7 +50,6 @@ export default function Tracker() {
     );
   if (!user) return <Login />;
   const budget = budgetForMonth(snapshot.budgets, month);
-  const plan = calculatePlan(budget, snapshot.expenses, month, today);
   const expenses = snapshot.expenses.filter((e) => e.date.startsWith(month));
   const monthName = new Date(month + "-01T12:00:00").toLocaleDateString(
     "en-US",
@@ -104,43 +103,7 @@ export default function Tracker() {
       ) : (
         <>
           <BankConnection onChange={refreshBank} />
-          <section className="balances">
-            <div className="hero-balance">
-              <p>Daily spending</p>
-              <strong>{money(plan.todayGuide)}</strong>
-              <span>
-                {plan.daysLeft
-                  ? `${plan.daysLeft} days left`
-                  : "This month has ended."}
-              </span>
-            </div>
-            <div className="balance-card">
-              <p>Spending left</p>
-              <strong
-                className={plan.discretionaryRemaining < 0 ? "negative" : ""}
-              >
-                {money(plan.discretionaryRemaining)}
-              </strong>
-            </div>
-            <div className="balance-card">
-              <p>Groceries left</p>
-              <strong className={plan.groceriesRemaining < 0 ? "negative" : ""}>
-                {money(plan.groceriesRemaining)}
-              </strong>
-              <span>of {money(budget.groceries)}</span>
-            </div>
-          </section>
-          <div className="invest-strip">
-            <span>
-              Investing <strong>{money(budget.investing)}</strong> / month
-            </span>
-          </div>
-          {plan.groceriesRemaining < 0 ? (
-            <p className="error">
-              Groceries are over budget by {money(-plan.groceriesRemaining)}.
-              Your daily spending limit includes this shortfall.
-            </p>
-          ) : null}
+          <MonthlyMoney budget={budget} expenses={expenses} />
           <div role="status" className="notice">
             {notice}
             {removed ? (
@@ -202,35 +165,7 @@ export default function Tracker() {
                   busy={busy}
                   onSave={updateBudget}
                 />
-                <details className="panel">
-                  <summary>How the numbers work</summary>
-                  <dl className="math">
-                    <dt>Income</dt>
-                    <dd>{money(budget.income)}</dd>
-                    <dt>Bills & transit reserved</dt>
-                    <dd>−{money(plan.fixed)}</dd>
-                    <dt>Groceries reserved</dt>
-                    <dd>−{money(budget.groceries)}</dd>
-                    <dt>Renewal & refill savings</dt>
-                    <dd>−{money(plan.setAsides)}</dd>
-                    <dt>Depreciation deduction</dt>
-                    <dd>−{money(budget.depreciation)}</dd>
-                    <dt>Investing target</dt>
-                    <dd>−{money(budget.investing)}</dd>
-                    <dt>Discretionary budget</dt>
-                    <dd>{money(plan.discretionaryBudget)}</dd>
-                    <dt>Discretionary spent</dt>
-                    <dd>−{money(plan.discretionarySpent)}</dd>
-                    <dt>Spending money left</dt>
-                    <dd>{money(plan.discretionaryRemaining)}</dd>
-                  </dl>
-                  <p className="hint">
-                    Planned income, not your bank balance. Enter all purchases
-                    for an accurate guide. Grocery overspending is shown
-                    separately. Depreciation is a noncash deduction you can
-                    change or set to zero.
-                  </p>
-                </details>
+
               </div>
             ) : null}
           </div>

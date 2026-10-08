@@ -1072,3 +1072,29 @@ details on demand. */
 .review-actions button { flex: 1; min-height: 48px; }
 .review-empty { text-align: center; }
 @media (prefers-reduced-motion: reduce) { .review-card { transform: none !important; } }
+
+.money-flow { margin-bottom: 18px; }
+.money-income, .money-start, .money-remaining { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.money-income strong { font-size:26px; }
+.money-obligations { display:grid; gap:10px; margin-top:20px; padding-left:16px; border-left:2px solid var(--line); }
+.money-obligations > div { display:flex; gap:8px; align-items:center; }
+.money-obligations > div > span:first-child { width:8px; height:8px; border-radius:50%; }
+.money-obligations strong { margin-left:auto; }
+.money-connector { text-align:center; font-size:28px; color:var(--muted); }
+.money-start { color:var(--green); }
+.money-start strong { font-size:28px; }
+.money-river { display:flex; height:34px; border-radius:10px; overflow:hidden; margin:20px 0; }
+.money-river > div { min-width:2px; }
+.money-legend { display:grid; grid-template-columns:1fr 1fr; gap:10px 20px; }
+.money-legend > div { display:flex; align-items:center; gap:6px; font-size:13px; }
+.money-legend i { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.money-legend strong { margin-left:auto; }
+.money-remaining { background:var(--green); color:white; border-radius:16px; padding:20px; margin-top:20px; }
+.money-remaining strong { font-size:32px; }
+.money-remaining .negative { color:#ffd2c8; }
+.money-wants { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+.money-wants > div { display:grid; gap:6px; padding:12px; border:1px solid var(--line); border-radius:12px; }
+.money-wants small { color:var(--muted); }
+.review-swipe-zone { touch-action:none; }
+.review-card fieldset[hidden] { display:none; }
+@media(max-width:420px) { .money-remaining { flex-direction:column; align-items:flex-start; } .money-legend { grid-template-columns:1fr; } .review-actions button { padding:10px 7px; font-size:12px; } }

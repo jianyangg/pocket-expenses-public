@@ -29,3 +29,7 @@ See [technical setup](TECHNICAL_SETUP.md) and [contributing](CONTRIBUTING.md).
 ## Optional bank sync
 
 Connect Chase and other Plaid-supported banks using your own server-side credentials. See [bank sync setup](BANK_SYNC.md).
+
+## Monthly money view
+
+The dashboard starts with income minus rent, utilities and initial setup depreciation. Actual groceries, wants and investments reduce the remaining balance. Subscriptions and transit are wants; their planned targets are shown but not reserved. Grocery, investing, refill and renewal targets are optional planning figures and no longer subtract from this dashboard balance. Bank classifications can be corrected in Categorize: left for groceries, right for shopping, up for other choices. Untagged transactions are shown first by default.

@@ -1,4 +1,4 @@
-import { buckets, calculatePlan, type Expense, type Budget } from "./budget";
+import { buckets, type Expense, type Budget } from "./budget";
 export type ChartSlice = { label: string; amount: number };
 const labels = {
   discretionary: "Shopping & dining",
@@ -20,22 +20,10 @@ export function spendingSlices(expenses: Expense[]): ChartSlice[] {
     .filter((s) => s.amount !== 0);
 }
 export function budgetSlices(b: Budget): ChartSlice[] {
-  const available = calculatePlan(
-    b,
-    [],
-    "2026-10",
-    "2026-10-01",
-  ).discretionaryBudget;
   return [
-    { label: "Rent", amount: b.rent },
-    {
-      label: "Bills & savings",
-      amount:
-        b.utilities + b.subscriptions + b.transit + b.refills + b.renewals,
-    },
-    { label: "Groceries", amount: b.groceries },
-    { label: "Investing", amount: b.investing },
-    { label: "Past purchases", amount: b.depreciation },
-    { label: "Spending", amount: Math.max(0, available) },
-  ].filter((s) => s.amount > 0);
+    {label:"Rent",amount:b.rent},
+    {label:"Utilities",amount:b.utilities},
+    {label:"Setup depreciation",amount:b.depreciation},
+    {label:"Available",amount:Math.max(0,b.income-b.rent-b.utilities-b.depreciation)}
+  ].filter(s=>s.amount>0);
 }
