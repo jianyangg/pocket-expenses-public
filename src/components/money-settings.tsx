@@ -23,12 +23,15 @@ export default function MoneySettings({
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    else if (!open && dialog.open) dialog.close();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      dialog.focus({ preventScroll: true });
+    } else if (!open && dialog.open) dialog.close();
   }, [open]);
   return (
     <dialog
       ref={ref}
+      tabIndex={-1}
       className="money-settings-sheet"
       aria-labelledby="money-settings-title"
       onCancel={(e) => {

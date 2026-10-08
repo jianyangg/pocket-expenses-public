@@ -87,6 +87,7 @@ export function financialStatements(
     setupPurchases,
     rentPaid,
     utilitiesPaid,
+    insurancePaid,
     accrualAdjustment,
     depreciation,
     netIncome,

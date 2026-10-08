@@ -1,0 +1,88 @@
+/* Shared restrained modal controls; keyboard focus remains visible in blue. */
+.money-settings-sheet {
+  border-radius: 20px;
+  width: min(420px, calc(100% - 32px));
+}
+.settings-sheet-content {
+  padding: 20px;
+}
+.money-settings-sheet .section-head {
+  margin: 0 0 12px;
+  align-items: center;
+}
+.money-settings-sheet .section-head h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+.money-settings-sheet .section-head > .quiet {
+  color: #007aff;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 12px;
+  background: #eef4ff;
+  border-radius: 10px;
+  min-height: 40px;
+}
+.money-settings-sheet .setup-switch {
+  padding: 14px 0 18px;
+  font-size: 14px;
+  gap: 16px;
+}
+.money-settings-sheet .bank-connection {
+  padding-top: 18px;
+}
+.money-settings-sheet .bank-connection .section-head {
+  margin-bottom: 8px;
+}
+.money-settings-sheet .bank-connection button {
+  font-size: 13px;
+  padding: 10px 12px;
+  min-height: 44px;
+  border-radius: 10px;
+}
+.money-settings-sheet .bank-connection .quiet {
+  background: #f2f2f7;
+  color: var(--ink);
+}
+.money-settings-sheet .bank-connection button:last-of-type.quiet {
+  color: #c8332d;
+}
+.money-settings-sheet .bank-connection .hint {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+.money-settings-sheet .bank-connection .section-head span {
+  background: #edf8ef;
+  color: #25813b;
+  border-radius: 6px;
+  padding: 4px 7px;
+  font-size: 11px;
+}
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+@media (max-width: 600px) {
+  .money-settings-sheet {
+    width: 100%;
+    border-radius: 22px 22px 0 0;
+  }
+  .settings-sheet-content {
+    padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
+  }
+}
+
+.money-settings-sheet:focus,
+.category-details:focus {
+  outline: none;
+}
+.category-details .section-head > .quiet {
+  background: #eef4ff;
+  color: #007aff;
+  border-radius: 10px;
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+}

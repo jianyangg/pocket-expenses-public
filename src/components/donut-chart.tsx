@@ -12,9 +12,13 @@ const colors = [
 export default function DonutChart({
   slices,
   label,
+  onSelect,
+  isSelectable,
 }: {
   slices: ChartSlice[];
   label: string;
+  onSelect?: (label:string)=>void;
+  isSelectable?: (label:string)=>boolean;
 }) {
   const positive = slices.filter((s) => s.amount > 0);
   const total = positive.reduce((n, s) => n + s.amount, 0);
@@ -44,6 +48,18 @@ export default function DonutChart({
       <ul className="donut-legend">
         {slices.map((slice) => (
           <li key={slice.label}>
+            {onSelect && (isSelectable?.(slice.label)??true)?<button type="button" className="chart-category-button" onClick={()=>onSelect(slice.label)} aria-label={"View "+slice.label+" transactions, "+money(slice.amount)}>
+            <span>
+              <i
+                style={{
+                  background:
+                    colors[Math.max(0, slices.indexOf(slice)) % colors.length],
+                }}
+              />
+              {slice.label}
+            </span>
+            <span className="chart-category-amount"><strong>{money(slice.amount)}</strong><b aria-hidden="true">›</b></span>
+            </button>:<>
             <span>
               <i
                 style={{
@@ -54,6 +70,7 @@ export default function DonutChart({
               {slice.label}
             </span>
             <strong>{money(slice.amount)}</strong>
+            </>}
           </li>
         ))}
       </ul>

@@ -1,0 +1,24 @@
+ .donut-legend li:has(button) { display:block; }
+.donut-legend .chart-category-button { width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:40px; padding:6px 0; background:transparent; color:var(--ink); font-size:inherit; border-radius:6px; text-align:left; font-weight:400; }
+.chart-category-button > span:first-child { display:flex; align-items:center; gap:7px; }
+.chart-category-amount { display:flex; align-items:center; gap:7px; }
+.chart-category-amount b { font-size:18px; font-weight:400; color:#a5a5ae; }
+.allocation-surface .donut-legend { gap:0; }
+.category-details { border:0; padding:0; width:min(560px,calc(100% - 32px)); max-height:82dvh; overflow-y:auto; border-radius:24px; background:white; color:var(--ink); }
+.category-details::backdrop { background:#17172155; backdrop-filter:blur(4px); }
+.category-details-header { padding:20px 22px 18px; position:sticky; top:0; background:white; border-bottom:1px solid var(--line); z-index:1; }
+.category-details-header .section-head { margin:0; }
+.category-details-header .quiet { min-height:44px; padding:10px; }
+.category-details-total { display:grid; gap:5px; margin-top:8px; }
+.category-details-total strong { font-size:30px; letter-spacing:-1px; font-weight:600; }
+.category-details-total span { color:var(--muted); font-size:12px; }
+.category-transactions { margin:0; padding:0 22px 20px; list-style:none; }
+.category-transactions li { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:16px 0; border-bottom:1px solid var(--line); }
+.category-transactions li > div { min-width:0; }
+.category-transactions p { font-size:14px; line-height:1.5; overflow-wrap:anywhere; }
+.category-transactions small { display:block; font-size:11px; color:var(--muted); margin-top:5px; line-height:1.5; overflow-wrap:anywhere; }
+.category-transactions li > strong { flex-shrink:0; font-size:14px; font-weight:600; font-variant-numeric:tabular-nums; text-align:right; }
+.transaction-refund { color:#248741; }
+.category-details-empty { padding:24px; font-size:14px; color:var(--muted); }
+body:has(.category-details[open]) { overflow:hidden; }
+@media(max-width:600px) { .donut-legend .chart-category-button { min-height:44px; } .chart-category-button > span:first-child { gap:5px; } .chart-category-amount { gap:4px; } .category-details { position:fixed; bottom:0; top:auto; margin:0 auto; width:100%; max-width:100%; border-radius:24px 24px 0 0; } .category-transactions { padding-bottom:calc(22px + env(safe-area-inset-bottom)); } }

@@ -1,3 +1,7 @@
+"use client";
+import {useState} from "react";
+import {spendingCategories,type SpendingCategory} from "@/lib/category-breakdown";
+import CategoryDetails from "./category-details";
 import { money, type Budget, type Expense } from "@/lib/budget";
 import { moneyFlow } from "@/lib/money-flow";
 import DonutChart from "./donut-chart";
@@ -15,17 +19,11 @@ export default function MonthlyMoney({
   month: string;
   today: string;
 }) {
+  const [selected,setSelected]=useState<SpendingCategory|null>(null);
   const p = moneyFlow(budget, expenses, includeSetup);
   const spent =
     p.groceries + p.shopping + p.subscriptions + p.transit + p.investments;
-  const slices = [
-    { label: "Groceries", amount: p.groceries },
-    { label: "Shopping & dining", amount: p.shopping },
-    { label: "Subscriptions", amount: p.subscriptions },
-    { label: "Transit", amount: p.transit },
-    { label: "Investing", amount: p.investments },
-    { label: "Available", amount: Math.max(0, p.remaining) },
-  ];
+  const slices=[...spendingCategories.map(c=>({label:c.label,amount:p[c.key]})),{label:"Available",amount:Math.max(0,p.remaining)}];
   const groceryProgress =
     budget.groceries > 0
       ? Math.max(0, Math.min(100, (p.groceries / budget.groceries) * 100))
@@ -108,7 +106,7 @@ export default function MonthlyMoney({
           <h2>This month</h2>
           <span className="allocation-spent">{money(spent)} used</span>
         </div>
-        <DonutChart slices={slices} label="After essentials" />
+        <DonutChart slices={slices} label="After essentials" isSelectable={label=>label!=="Available"} onSelect={label=>setSelected(spendingCategories.find(c=>c.label===label)?.key??null)} />
         <div className="grocery-budget">
           <div>
             <span>Groceries remaining</span>
@@ -129,6 +127,7 @@ export default function MonthlyMoney({
           </small>
         </div>
       </div>
+      <CategoryDetails category={selected} expenses={expenses} month={month} onClose={()=>setSelected(null)}/>
     </section>
   );
 }

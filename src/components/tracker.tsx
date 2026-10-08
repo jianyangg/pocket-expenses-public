@@ -127,15 +127,6 @@ export default function Tracker() {
             ready={finance.ready}
             error={finance.error}
           />
-          {view === "statements" ? (
-            <FinancialStatements
-              budget={budget}
-              expenses={expenses}
-              month={month}
-              settings={finance.settings}
-              onSave={finance.save}
-            />
-          ) : null}
           <div role="status" className="notice">
             {notice}
             {removed ? (
@@ -186,6 +177,16 @@ export default function Tracker() {
               </button>
             ))}
           </nav>
+          {view === "statements" ? (
+            <FinancialStatements
+              budget={budget}
+              expenses={expenses}
+              month={month}
+              today={today}
+              settings={finance.settings}
+              onSave={finance.save}
+            />
+          ) : null}
           {view === "overview" ? (
             <>
               <MonthlyMoney
