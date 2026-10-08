@@ -8,7 +8,8 @@
     "start": "next start",
     "test": "tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "db:migrate": "node scripts/migrate.mjs"
+    "db:migrate": "node scripts/migrate.mjs",
+    "bank:setup": "node scripts/setup-bank.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

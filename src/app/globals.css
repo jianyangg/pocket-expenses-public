@@ -1023,3 +1023,29 @@ details on demand. */
     max-height: calc(var(--visible-height, 100dvh) - 24px);
   }
 }
+
+.bank-connection {
+  margin-bottom: 16px;
+}
+.bank-connection details {
+  margin-top: 16px;
+}
+.bank-review {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.bank-review span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.bank-review small {
+  display: block;
+  color: var(--muted);
+}
+.bank-review button {
+  padding: 8px 12px;
+}

@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { calculatePlan, money } from "@/lib/budget";
 import { budgetForMonth, downloadSnapshot } from "@/lib/storage";
 import { authClient } from "@/lib/auth/client";
@@ -9,6 +9,7 @@ import QuickEntry from "./quick-entry";
 import BudgetSettings from "./budget-settings";
 import ExpenseList from "./expense-list";
 import Analysis from "./analysis";
+import BankConnection from "./bank-connection";
 
 export default function Tracker() {
   const {
@@ -37,6 +38,9 @@ export default function Tracker() {
     "overview",
   );
   const importInput = useRef<HTMLInputElement>(null);
+  const refreshBank = useCallback(() => {
+    void reload(true);
+  }, [reload]);
   if (!authReady || !today)
     return (
       <main className="loading" role="status">
@@ -98,6 +102,7 @@ export default function Tracker() {
         </p>
       ) : (
         <>
+          <BankConnection onChange={refreshBank} />
           <section className="balances">
             <div className="hero-balance">
               <p>Daily spending</p>

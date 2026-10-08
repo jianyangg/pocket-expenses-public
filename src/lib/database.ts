@@ -35,6 +35,10 @@ export async function writeSnapshot(userId: string, snapshot: Snapshot) {
       on conflict(id) do update set amount=excluded.amount,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,date=excluded.date
       where expenses.user_id=${userId}`,
     ),
+    ...snapshot.expenses.map(
+      (e) =>
+        sql`update bank_transactions set customized=true where user_id=${userId} and expense_id=${e.id}`,
+    ),
     ...Object.entries(snapshot.budgets).map(
       ([month, plan]) => sql`insert into monthly_budgets(user_id,month,plan)
       values (${userId},${month},${JSON.stringify(plan)}::jsonb)
@@ -47,6 +51,7 @@ export async function deleteExpense(userId: string, id: string) {
   await sql.transaction([
     sql`set local role pocket_app`,
     sql`select set_config('app.user_id', ${userId}, true)`,
+    sql`update bank_transactions set decision='ignored',expense_id=null,customized=true where expense_id=${id} and user_id=${userId}`,
     sql`delete from expenses where id=${id} and user_id=${userId}`,
   ]);
 }

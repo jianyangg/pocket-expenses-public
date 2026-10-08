@@ -25,3 +25,7 @@ Today's amount divides that balance by the remaining days this month. Grocery ov
 Current currency is USD and the calendar uses America/New_York. These are code settings, not automatic currency conversion. Each month inherits the nearest earlier budget. Export a JSON backup from Budget before major changes.
 
 See [technical setup](TECHNICAL_SETUP.md) and [contributing](CONTRIBUTING.md).
+
+## Optional bank sync
+
+Connect Chase and other Plaid-supported banks using your own server-side credentials. See [bank sync setup](BANK_SYNC.md).
