@@ -50,9 +50,8 @@ export default function QuickEntry({
     .sort((a, b) => b[1] - a[1])
     .map(([tag]) => tag);
   for (const tag of [
-    "food",
+    "dining",
     "groceries",
-    "clothes",
     "shopping",
     "utilities",
     "insurance",
@@ -60,6 +59,12 @@ export default function QuickEntry({
     "subscriptions",
   ])
     if (!counts.has(tag)) existingTags.push(tag);
+  const preferredTags =
+    [...expenses]
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .find(
+        (e) => e.description.toLowerCase().trim() === name.toLowerCase().trim(),
+      )?.tags ?? [];
   const recentNames = [
     ...new Set(
       [...expenses]
@@ -176,7 +181,9 @@ export default function QuickEntry({
         }}
       >
         <div className="section-head">
-          <span>Step {step + 1} of 3</span>
+          <h2 id="expense-dialog-title">
+            {["Amount", "Description", "Tags"][step]}
+          </h2>
           <button
             type="button"
             className="quiet"
@@ -187,9 +194,6 @@ export default function QuickEntry({
             ×
           </button>
         </div>
-        <h2 id="expense-dialog-title">
-          {["How much?", "What was it for?", "Add tags"][step]}
-        </h2>
         <form onSubmit={submit}>
           <div hidden={step !== 0}>
             <label htmlFor="expense-amount" className="sr-only">
@@ -242,6 +246,8 @@ export default function QuickEntry({
           <div hidden={step !== 2}>
             <TagPicker
               ref={tagRef}
+              compact
+              preferred={preferredTags}
               tags={tags}
               query={tagQuery}
               existing={existingTags}
@@ -296,12 +302,17 @@ export default function QuickEntry({
                 type="button"
                 className="quiet"
                 disabled={busy}
+                onPointerDown={(e) => e.preventDefault()}
                 onClick={() => move(step - 1)}
               >
                 Back
               </button>
             ) : null}
-            <button type="submit" disabled={busy}>
+            <button
+              type="submit"
+              disabled={busy}
+              onPointerDown={(e) => e.preventDefault()}
+            >
               {busy
                 ? "Saving…"
                 : step < 2

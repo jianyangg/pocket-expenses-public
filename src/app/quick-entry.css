@@ -1,0 +1,155 @@
+/* Keep entry controls next to the mobile keyboard, rather than at page top. */
+.expense-dialog {
+  border: 0;
+  padding: 20px;
+  box-shadow: 0 16px 70px #00000025;
+}
+.expense-dialog::backdrop {
+  background: #17172155;
+  opacity: 1;
+}
+.expense-dialog .section-head {
+  margin: 0 0 16px;
+  align-items: center;
+}
+.expense-dialog .section-head h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+.expense-dialog .section-head .quiet {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 24px;
+}
+.expense-dialog input:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 1px;
+}
+.expense-dialog .amount-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f5f5f7;
+}
+.expense-dialog .amount-field span {
+  font-size: 24px;
+  color: var(--muted);
+}
+.expense-dialog .amount-field input {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 32px;
+  padding: 8px 0;
+}
+.expense-dialog .amount-field input:focus-visible {
+  outline: none;
+}
+.expense-dialog .amount-field:focus-within {
+  border-color: #007aff;
+  box-shadow: 0 0 0 1px #007aff;
+}
+.expense-step-actions {
+  margin-top: 16px;
+  gap: 8px;
+}
+.expense-step-actions button {
+  min-height: 46px;
+  padding: 12px 16px;
+}
+.selected-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.selected-tags:empty {
+  display: none;
+}
+.compact-tag-picker .selected-tags {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 1px 0 4px;
+}
+.compact-tag-picker .tag-chip {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 0;
+  background: #e4eeff;
+  color: #007aff;
+  border-radius: 8px;
+}
+.compact-tag-picker .tag-input-row {
+  display: block;
+  padding: 0;
+  border: 0;
+}
+.compact-tag-picker .tag-input-row input {
+  font-size: 16px;
+  padding: 12px;
+  width: 100%;
+}
+.compact-tag-picker .tag-suggestions {
+  margin-top: 10px;
+  gap: 6px;
+  max-height: 96px;
+}
+.compact-tag-picker .tag-suggestions button {
+  min-height: 38px;
+  font-size: 12px;
+  padding: 8px 10px;
+  border: 0;
+  background: #f2f2f7;
+  color: var(--ink);
+  border-radius: 8px;
+}
+.expense-extra-options {
+  margin-top: 12px;
+  font-size: 11px;
+}
+.expense-extra-options summary {
+  min-height: 28px;
+  padding: 5px 0;
+  color: var(--muted);
+}
+.expense-extra-options .refund-option {
+  flex-direction: row;
+}
+@media (max-width: 850px) {
+  .expense-dialog {
+    position: fixed;
+    left: 50%;
+    top: var(--visible-bottom, calc(100dvh - 8px));
+    bottom: auto;
+    transform: translate(-50%, -100%);
+    margin: 0;
+    width: min(480px, calc(100% - 16px));
+    max-height: calc(var(--visible-height, 100dvh) - 16px);
+    padding: 16px;
+    border-radius: 20px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .expense-dialog .section-head {
+    margin-bottom: 12px;
+  }
+  .expense-dialog .expense-step-actions {
+    position: sticky;
+    bottom: -16px;
+    padding: 10px 0 0;
+    background: white;
+    margin-top: 8px;
+  }
+  .expense-dialog .tag-suggestions button,
+  .expense-dialog .tag-chip {
+    min-height: 36px;
+  }
+}

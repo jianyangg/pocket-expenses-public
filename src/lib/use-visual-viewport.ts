@@ -20,6 +20,7 @@ export function useVisualViewport(active: boolean) {
     ? {
         "--visible-height": `${viewport.height}px`,
         "--visible-top": `${viewport.top + 12}px`,
+        "--visible-bottom": `${viewport.top + viewport.height - 8}px`,
       }
     : {};
 }
