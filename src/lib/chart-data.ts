@@ -19,11 +19,17 @@ export function spendingSlices(expenses: Expense[]): ChartSlice[] {
     }))
     .filter((s) => s.amount !== 0);
 }
-export function budgetSlices(b: Budget): ChartSlice[] {
+export function budgetSlices(b: Budget, includeSetup = false): ChartSlice[] {
   return [
-    {label:"Rent",amount:b.rent},
-    {label:"Utilities",amount:b.utilities},
-    {label:"Setup depreciation",amount:b.depreciation},
-    {label:"Available",amount:Math.max(0,b.income-b.rent-b.utilities-b.depreciation)}
-  ].filter(s=>s.amount>0);
+    { label: "Rent", amount: b.rent },
+    { label: "Utilities", amount: b.utilities },
+    { label: "Setup depreciation", amount: includeSetup ? b.depreciation : 0 },
+    {
+      label: "Available",
+      amount: Math.max(
+        0,
+        b.income - b.rent - b.utilities - (includeSetup ? b.depreciation : 0),
+      ),
+    },
+  ].filter((s) => s.amount > 0);
 }

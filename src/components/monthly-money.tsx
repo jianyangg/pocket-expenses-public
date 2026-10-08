@@ -1,6 +1,97 @@
-import {money,type Expense,type Budget} from '@/lib/budget';
-import {moneyFlow} from '@/lib/money-flow';
-export default function MonthlyMoney({budget,expenses}:{budget:Budget;expenses:Expense[]}){
- const p=moneyFlow(budget,expenses);const parts=[{label:'Rent',amount:budget.rent,color:'#758b9a'},{label:'Utilities',amount:budget.utilities,color:'#b0c5ce'},{label:'Setup · /9 months',amount:budget.depreciation,color:'#d2b387'},{label:'Groceries',amount:p.groceries,color:'#8dac76'},{label:'Wants',amount:p.wants,color:'#ca8f86'},{label:'Invested',amount:p.investments,color:'#8992ba'},{label:'Left',amount:Math.max(0,p.remaining),color:'#285c46'}];const total=parts.reduce((n,s)=>n+Math.max(0,s.amount),0)||1;
- return <section className="panel money-flow"><div className="money-income"><span>Monthly income</span><strong>{money(budget.income)}</strong></div><div className="money-obligations">{parts.slice(0,3).map(s=><div key={s.label}><span style={{background:s.color}}/><span>{s.label}</span><strong>−{money(s.amount)}</strong></div>)}</div><div className="money-connector" aria-hidden="true">↓</div><div className="money-start"><span>After essentials</span><strong>{money(p.starting)}</strong></div><div className="money-river" role="img" aria-label={parts.map(s=>`${s.label}: ${money(s.amount)}`).join(', ')}>{parts.filter(s=>s.amount>0).map(s=><div key={s.label} style={{flexBasis:`${Math.max(0,s.amount)/total*100}%`,background:s.color}}/>)}</div><div className="money-legend">{parts.map(s=><div key={s.label}><i style={{background:s.color}}/><span>{s.label}</span><strong>{money(s.amount)}</strong></div>)}</div><div className="money-remaining"><span>Left to spend or invest</span><strong className={p.remaining<0?'negative':''}>{money(p.remaining)}</strong></div><div className="money-wants"><div><span>Subscriptions · want</span><strong>{money(p.subscriptions)} spent</strong><small>{money(budget.subscriptions)} planned</small></div><div><span>Transit · want</span><strong>{money(p.transit)} spent</strong><small>{money(budget.transit)} planned</small></div></div><p className="hint">Groceries, wants and actual investments reduce this balance. Planned targets do not. Rent and utilities are reserved once; setup depreciation is not a new cash payment.</p></section>;
+import { money, type Budget, type Expense } from "@/lib/budget";
+import { moneyFlow } from "@/lib/money-flow";
+export default function MonthlyMoney({
+  budget,
+  expenses,
+  includeSetup,
+  onSettings,
+}: {
+  budget: Budget;
+  expenses: Expense[];
+  includeSetup: boolean;
+  onSettings: () => void;
+}) {
+  const p = moneyFlow(budget, expenses, includeSetup);
+  const parts = [
+    { label: "Groceries", amount: p.groceries, color: "#6c9471" },
+    { label: "Shopping & other", amount: p.shopping, color: "#a4b1c4" },
+    { label: "Subscriptions", amount: p.subscriptions, color: "#a398ba" },
+    { label: "Transit", amount: p.transit, color: "#92b9c1" },
+    { label: "Investing", amount: p.investments, color: "#c9b183" },
+    { label: "Available", amount: Math.max(0, p.remaining), color: "#275745" },
+  ];
+  const total = parts.reduce((n, s) => n + Math.max(0, s.amount), 0) || 1;
+  return (
+    <section className="panel money-dashboard">
+      <div className="money-title">
+        <span>Available this month</span>
+        <button
+          className="quiet"
+          aria-label="Money view settings"
+          onClick={onSettings}
+        >
+          Settings
+        </button>
+      </div>
+      <strong
+        className={"money-headline " + (p.remaining < 0 ? "negative" : "")}
+      >
+        {money(p.remaining)}
+      </strong>
+      <div
+        className="money-river"
+        role="img"
+        aria-label={parts
+          .map((s) => s.label + " " + money(s.amount))
+          .join(", ")}
+      >
+        {parts
+          .filter((s) => s.amount > 0)
+          .map((s) => (
+            <div
+              key={s.label}
+              style={{
+                flexBasis: `${(s.amount / total) * 100}%`,
+                background: s.color,
+              }}
+            />
+          ))}
+      </div>
+      <div className="money-categories">
+        {parts.slice(0, 5).map((s) => (
+          <div key={s.label}>
+            <span>
+              <i style={{ background: s.color }} />
+              {s.label}
+            </span>
+            <strong>{money(s.amount)}</strong>
+            {s.label === "Investing" ? (
+              <small>{money(budget.investing)} target</small>
+            ) : s.label === "Subscriptions" ? (
+              <small>{money(budget.subscriptions)} planned</small>
+            ) : null}
+          </div>
+        ))}
+      </div>
+      <details className="money-baseline">
+        <summary>
+          Income & deductions <strong>{money(p.starting)}</strong>
+        </summary>
+        <dl className="math">
+          <dt>Monthly income</dt>
+          <dd>{money(budget.income)}</dd>
+          <dt>Rent</dt>
+          <dd>−{money(budget.rent)}</dd>
+          <dt>Utilities & internet</dt>
+          <dd>−{money(budget.utilities)}</dd>
+          {includeSetup ? (
+            <>
+              <dt>Setup depreciation</dt>
+              <dd>−{money(budget.depreciation)}</dd>
+            </>
+          ) : null}
+        </dl>
+      </details>
+    </section>
+  );
 }

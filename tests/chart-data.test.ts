@@ -24,3 +24,17 @@ test("sample budget chart reconciles to monthly income", () => {
     300000,
   );
 });
+
+test("setup is excluded by default and included only when selected", () => {
+  const b = {
+    ...sampleBudget,
+    income: 300000,
+    rent: 150000,
+    utilities: 10000,
+    depreciation: 10000,
+  };
+  assert.ok(!budgetSlices(b).some((s) => s.label === "Setup depreciation"));
+  assert.ok(
+    budgetSlices(b, true).some((s) => s.label === "Setup depreciation"),
+  );
+});

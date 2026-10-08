@@ -4,9 +4,11 @@ import DonutChart from "./donut-chart";
 export default function Analysis({
   expenses,
   budget,
+  includeSetup = false,
 }: {
   expenses: Expense[];
   budget: Budget;
+  includeSetup?: boolean;
 }) {
   const hasSpending = expenses.length > 0;
   const groups = new Map<string, number>();
@@ -17,7 +19,11 @@ export default function Analysis({
     <section className="panel analysis">
       <h2>{hasSpending ? "Spending breakdown" : "Budget breakdown"}</h2>
       <DonutChart
-        slices={hasSpending ? spendingSlices(expenses) : budgetSlices(budget)}
+        slices={
+          hasSpending
+            ? spendingSlices(expenses)
+            : budgetSlices(budget, includeSetup)
+        }
         label={hasSpending ? "Net spent" : "Budget"}
       />
       {hasSpending ? (

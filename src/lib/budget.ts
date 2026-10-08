@@ -9,6 +9,7 @@ export const buckets = [
 ] as const;
 export type Bucket = (typeof buckets)[number];
 export type Expense = {
+  reviewed?: boolean;
   id: string;
   amount: number;
   description: string;

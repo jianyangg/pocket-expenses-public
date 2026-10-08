@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 :root {
   --ink: #202b25;
   --muted: #718077;
@@ -15,7 +14,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "DM Sans", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 14px;
 }
 button,
@@ -70,7 +69,7 @@ h2,
 .wordmark,
 .hero-balance strong,
 .balance-card strong {
-  font-family: Manrope, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 h1 {
   font-size: 36px;
@@ -107,7 +106,7 @@ header {
   letter-spacing: -1px;
 }
 .wordmark span {
-  font-family: "DM Sans", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--muted);
   font-size: 12px;
   font-weight: 400;
@@ -1098,3 +1097,56 @@ details on demand. */
 .review-swipe-zone { touch-action:none; }
 .review-card fieldset[hidden] { display:none; }
 @media(max-width:420px) { .money-remaining { flex-direction:column; align-items:flex-start; } .money-legend { grid-template-columns:1fr; } .review-actions button { padding:10px 7px; font-size:12px; } }
+
+.money-dashboard { padding:28px; border:1px solid #e7e9eb; background:#fff; box-shadow:0 3px 18px #24352e04; }
+.money-title { display:flex; justify-content:space-between; align-items:center; color:#758078; font-size:14px; }
+.money-headline { display:block; font-size:clamp(42px,7vw,64px); font-weight:600; letter-spacing:-2.5px; margin:10px 0 24px; color:#214d3c; }
+.money-categories { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin:24px 0; }
+.money-categories > div { display:grid; gap:7px; }
+.money-categories span { font-size:13px; color:var(--muted); }
+.money-categories i { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:7px; }
+.money-categories strong { font-size:24px; font-weight:500; letter-spacing:-.5px; }
+.money-categories small { color:var(--muted); font-size:11px; }
+.money-baseline { border-top:1px solid var(--line); padding-top:16px; color:var(--muted); font-size:13px; }
+.money-baseline summary strong { float:right; color:var(--ink); }
+.statement-tabs { display:flex; gap:8px; margin:20px 0; }
+.statement-tabs button { background:var(--soft); color:var(--ink); flex:1; }
+.statement-tabs button[aria-pressed=true] { background:var(--green); color:white; }
+.statement-row { display:flex; justify-content:space-between; gap:16px; padding:14px 0; border-bottom:1px solid var(--line); font-size:14px; }
+.statement-total { font-weight:600; background:var(--soft); padding:14px 10px; border-radius:8px; }
+.statements details { margin-top:20px; }
+.statements form { margin-top:16px; }
+.statements input { width:100%; }
+.dashboard-tabs { overflow-x:auto; }
+.dashboard-tabs button { white-space:nowrap; font-size:13px; min-width:80px; }
+@media(max-width:600px) { .money-dashboard { padding:20px; } .money-categories { grid-template-columns:repeat(2,1fr); gap:20px 12px; } .money-categories strong { font-size:22px; } .statement-row { font-size:13px; } }
+
+/* Compact, thumb-friendly navigation; dialogs remain in the browser top layer. */
+.money-headline, .money-categories strong, .statement-row strong { font-variant-numeric: tabular-nums; }
+.money-headline.negative { color:#ad3d32; }
+@media(max-width:600px) {
+ .shell { padding:0 14px calc(150px + env(safe-area-inset-bottom)); }
+ .wordmark span { display:none; }
+ .panel { min-width:0; }
+ .dashboard-tabs { position:fixed; z-index:15; bottom:0; left:0; right:0; margin:0; padding:8px 6px calc(8px + env(safe-area-inset-bottom)); border-radius:0; border-top:1px solid var(--line); background:rgba(248,249,247,.96); backdrop-filter:blur(20px); gap:2px; overflow:visible; }
+ .dashboard-tabs button { flex:1; min-width:0; min-height:48px; padding:8px 2px; font-size:11px; border-radius:10px; }
+ .add-expense-button { bottom:calc(84px + env(safe-area-inset-bottom)); right:18px; }
+ .money-title button { min-height:44px; padding:8px 12px; }
+ .money-dashboard { padding:20px 18px; }
+ .money-river { height:24px; margin:16px 0; }
+ .money-headline { margin:8px 0 20px; font-size:clamp(38px,11vw,54px); }
+ .money-baseline summary { min-height:44px; padding:10px 0; }
+ .money-baseline summary strong { font-size:12px; }
+ .money-categories { margin:20px 0; gap:22px 12px; }
+ .money-categories > div { min-width:0; }
+ .money-categories span { font-size:12px; }
+ .statement-row > :first-child { min-width:0; overflow-wrap:anywhere; }
+ .statement-row strong { white-space:nowrap; flex-shrink:0; }
+ .statement-tabs button { min-height:44px; padding:10px; }
+ .review-presets button, .review-buckets button { min-height:44px; }
+ .review-swipe-zone { min-height:180px; display:flex; flex-direction:column; justify-content:center; }
+ .review-dates input, select, textarea { font-size:16px; }
+ .review-actions { position:sticky; bottom:80px; padding:8px 0; background:var(--white); }
+ .bank-review { flex-wrap:wrap; }
+ .bank-review span { flex-basis:100%; }
+}

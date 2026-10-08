@@ -14,6 +14,7 @@ export function reviewQueue(
         e.date >= start &&
         e.date <= end &&
         !done.has(e.id) &&
+        !e.reviewed &&
         (!untagged || !e.tags.length),
     )
     .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));

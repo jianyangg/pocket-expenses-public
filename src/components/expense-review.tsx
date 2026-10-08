@@ -40,7 +40,7 @@ export default function ExpenseReview({
     lock.current = true;
     setWorking(true);
     try {
-      if (save && !(await onSave(value))) return;
+      if (save && !(await onSave({ ...value, reviewed: true }))) return;
       setDone((ids) => [...ids, value.id]);
       setHistory((items) => [...items, { expense: current!, saved: save }]);
     } finally {
@@ -139,17 +139,6 @@ export default function ExpenseReview({
         <div className="panel review-empty">
           <h2>{done.length ? "All done" : "No transactions"}</h2>
           <p>Choose another date range to review more.</p>
-          {done.length ? (
-            <button
-              className="quiet"
-              onClick={() => {
-                setDone([]);
-                setHistory([]);
-              }}
-            >
-              Review again
-            </button>
-          ) : null}
         </div>
       )}
     </section>
@@ -242,6 +231,18 @@ function ReviewCard({
         <fieldset disabled={disabled} hidden={!options}>
           <legend className="sr-only">Categorize transaction</legend>
           <div className="review-buckets">
+            {["utilities", "transit", "subscriptions"].map((tag) => (
+              <button
+                type="button"
+                key={tag}
+                onClick={() => {
+                  setBucket("bill");
+                  setTags([tag]);
+                }}
+              >
+                {tag[0].toUpperCase() + tag.slice(1)}
+              </button>
+            ))}
             {(["discretionary", "groceries", "bill"] as Bucket[]).map(
               (value) => (
                 <button

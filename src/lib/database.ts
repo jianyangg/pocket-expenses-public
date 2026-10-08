@@ -13,7 +13,7 @@ export async function readSnapshot(userId: string): Promise<Snapshot> {
   const [, , expenses, plans] = await sql.transaction([
     sql`set local role pocket_app`,
     sql`select set_config('app.user_id', ${userId}, true)`,
-    sql`select id,amount,description,tags,bucket,to_char(date,'YYYY-MM-DD') as date from expenses where user_id=${userId} order by date,id`,
+    sql`select id,amount,description,tags,bucket,reviewed,to_char(date,'YYYY-MM-DD') as date from expenses where user_id=${userId} order by date,id`,
     sql`select month,plan from monthly_budgets where user_id=${userId}`,
   ]);
   return {
@@ -30,9 +30,9 @@ export async function writeSnapshot(userId: string, snapshot: Snapshot) {
     ...snapshot.expenses.map(
       (
         e,
-      ) => sql`insert into expenses(id,user_id,amount,description,tags,bucket,date)
-      values (${e.id},${userId},${e.amount},${e.description},${e.tags},${e.bucket},${e.date})
-      on conflict(id) do update set amount=excluded.amount,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,date=excluded.date
+      ) => sql`insert into expenses(id,user_id,amount,description,tags,bucket,date,reviewed)
+      values (${e.id},${userId},${e.amount},${e.description},${e.tags},${e.bucket},${e.date},${e.reviewed ?? false})
+      on conflict(id) do update set amount=excluded.amount,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,date=excluded.date,reviewed=excluded.reviewed
       where expenses.user_id=${userId}`,
     ),
     ...snapshot.expenses.map(

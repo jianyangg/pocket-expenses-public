@@ -4,12 +4,20 @@ import Script from "next/script";
 import { bankAction, useBankLink } from "@/lib/bank/use-bank-link";
 import { money } from "@/lib/budget";
 import type { BankStatus } from "@/lib/bank/types";
-export default function BankConnection({ onChange }: { onChange: () => void }) {
+export default function BankConnection({
+  onChange,
+  visible = true,
+}: {
+  onChange: () => void;
+  visible?: boolean;
+}) {
   const [state, setState] = useState<BankStatus>();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [pendingLink, setPendingLink] = useState(false);
-  useEffect(() => { setPendingLink(Boolean(sessionStorage.getItem("pocket-bank-link"))); }, []);
+  useEffect(() => {
+    setPendingLink(Boolean(sessionStorage.getItem("pocket-bank-link")));
+  }, []);
   const load = useCallback(async () => {
     try {
       const response = await fetch("/api/bank", { cache: "no-store" });
@@ -68,7 +76,7 @@ export default function BankConnection({ onChange }: { onChange: () => void }) {
       setBusy(false);
     }
   }
-  if (!state && !error) return null;
+  if (!visible || (!state && !error)) return null;
   return (
     <section className="panel bank-connection">
       {state?.configured ? (
@@ -180,7 +188,20 @@ export default function BankConnection({ onChange }: { onChange: () => void }) {
           Bank sync needs Plaid credentials in the server settings.
         </p>
       )}
-      {!state?.connected && pendingLink ? <button className="quiet" disabled={!link.ready || link.busy} onClick={() => { sessionStorage.removeItem("pocket-bank-link"); sessionStorage.removeItem("pocket-bank-update"); setPendingLink(false); void link.open(); }}>Start over</button> : null}
+      {!state?.connected && pendingLink ? (
+        <button
+          className="quiet"
+          disabled={!link.ready || link.busy}
+          onClick={() => {
+            sessionStorage.removeItem("pocket-bank-link");
+            sessionStorage.removeItem("pocket-bank-update");
+            setPendingLink(false);
+            void link.open();
+          }}
+        >
+          Start over
+        </button>
+      ) : null}
       {error || link.error ? (
         <p className="error" role="alert">
           {error || link.error}

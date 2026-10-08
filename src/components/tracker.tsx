@@ -10,6 +10,8 @@ import ExpenseList from "./expense-list";
 import Analysis from "./analysis";
 import ExpenseReview from "./expense-review";
 import MonthlyMoney from "./monthly-money";
+import FinancialStatements from "./financial-statements";
+import { useFinancial } from "@/lib/use-financial";
 import BankConnection from "./bank-connection";
 
 export default function Tracker() {
@@ -35,9 +37,11 @@ export default function Tracker() {
     deleteEntry,
     importFile,
   } = useTracker();
-  const [view, setView] = useState<"overview" | "activity" | "review" | "budget">(
-    "overview",
-  );
+  const finance = useFinancial(Boolean(user));
+  const [showMoneySettings, setShowMoneySettings] = useState(false);
+  const [view, setView] = useState<
+    "overview" | "activity" | "review" | "statements" | "budget"
+  >("overview");
   const importInput = useRef<HTMLInputElement>(null);
   const refreshBank = useCallback(() => {
     void reload(true);
@@ -102,8 +106,50 @@ export default function Tracker() {
         </p>
       ) : (
         <>
-          <BankConnection onChange={refreshBank} />
-          <MonthlyMoney budget={budget} expenses={expenses} />
+          <BankConnection onChange={refreshBank} visible={showMoneySettings} />
+          {showMoneySettings ? (
+            <section className="panel">
+              <div className="section-head">
+                <h2>Settings</h2>
+                <button
+                  className="quiet"
+                  onClick={() => setShowMoneySettings(false)}
+                >
+                  Done
+                </button>
+              </div>
+              <label className="review-filter">
+                <input
+                  type="checkbox"
+                  disabled={!finance.ready}
+                  checked={finance.settings.includeSetup}
+                  onChange={(e) =>
+                    void finance.save({
+                      ...finance.settings,
+                      includeSetup: e.target.checked,
+                    })
+                  }
+                />{" "}
+                Include setup depreciation
+              </label>
+              {finance.error ? <p className="error">{finance.error}</p> : null}
+            </section>
+          ) : null}
+          <MonthlyMoney
+            budget={budget}
+            expenses={expenses}
+            includeSetup={finance.settings.includeSetup}
+            onSettings={() => setShowMoneySettings((v) => !v)}
+          />
+          {view === "statements" ? (
+            <FinancialStatements
+              budget={budget}
+              expenses={expenses}
+              month={month}
+              settings={finance.settings}
+              onSave={finance.save}
+            />
+          ) : null}
           <div role="status" className="notice">
             {notice}
             {removed ? (
@@ -127,7 +173,15 @@ export default function Tracker() {
             onCancel={editing ? () => setEditing(undefined) : undefined}
           />
           <nav className="dashboard-tabs" aria-label="Dashboard sections">
-            {(["overview", "activity", "review", "budget"] as const).map((tab) => (
+            {(
+              [
+                "overview",
+                "activity",
+                "review",
+                "statements",
+                "budget",
+              ] as const
+            ).map((tab) => (
               <button
                 key={tab}
                 aria-pressed={view === tab}
@@ -137,14 +191,27 @@ export default function Tracker() {
                   ? "Overview"
                   : tab === "activity"
                     ? "Expenses"
-                    : tab === "review" ? "Categorize" : "Budget"}
+                    : tab === "review"
+                      ? "Categorize"
+                      : "Budget"}
               </button>
             ))}
           </nav>
           {view === "overview" ? (
-            <Analysis expenses={expenses} budget={budget} />
+            <Analysis
+              expenses={expenses}
+              budget={budget}
+              includeSetup={finance.settings.includeSetup}
+            />
           ) : null}
-          {view === "review" ? <ExpenseReview expenses={snapshot.expenses} today={today} busy={busy} onSave={add} /> : null}
+          {view === "review" ? (
+            <ExpenseReview
+              expenses={snapshot.expenses}
+              today={today}
+              busy={busy}
+              onSave={add}
+            />
+          ) : null}
           <div className="content-grid">
             {view === "activity" ? (
               <ExpenseList
@@ -165,7 +232,6 @@ export default function Tracker() {
                   busy={busy}
                   onSave={updateBudget}
                 />
-
               </div>
             ) : null}
           </div>

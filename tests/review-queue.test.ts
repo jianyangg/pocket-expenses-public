@@ -35,3 +35,11 @@ test("date presets cross month boundaries and swipes require deliberate travel",
   assert.equal(swipeAction(100), "discretionary");
   assert.equal(swipeAction(-100), "groceries");
 });
+
+test("reviewed expenses stay out of the queue after tab navigation or a database reload", () => {
+  const saved = { ...expense("saved", "2026-10-08"), reviewed: true };
+  assert.deepEqual(
+    reviewQueue([saved], "2026-10-08", "2026-10-08", [], false),
+    [],
+  );
+});

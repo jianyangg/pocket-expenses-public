@@ -8,6 +8,7 @@ import {
   records,
   signingKey,
 } from "./store";
+import { inferCategory } from "../infer-category";
 import { toExpense, findDuplicate } from "./transactions";
 import type { SyncPage, BankTransaction, TransactionRecord } from "./types";
 export async function syncBank(
@@ -77,7 +78,10 @@ export async function syncBank(
           (t.pending_transaction_id
             ? recordMap.get(t.pending_transaction_id)
             : undefined);
-        const expense = toExpense(t);
+        const rawExpense = toExpense(t);
+        const expense = rawExpense
+          ? inferCategory(rawExpense, snapshot.expenses)
+          : null;
         let expenseId = previous?.expense_id || null;
         let owned = previous?.owned || false;
         let decision = previous?.decision || "imported";
@@ -98,21 +102,15 @@ export async function syncBank(
           }
         }
         if (previous && owned && !expense && expenseId) {
-          statements.push(sql`delete from expenses where id=${expenseId} and user_id=${userId}`);
+          statements.push(
+            sql`delete from expenses where id=${expenseId} and user_id=${userId}`,
+          );
           expenseId = null;
           decision = "ignored";
         }
         if (expenseId) retainedIds.add(expenseId);
         if (decision === "imported" && expense && owned) {
           expense.id = expenseId!;
-          const learned = snapshot.expenses.find(
-            (e) =>
-              e.description.toLowerCase() === expense.description.toLowerCase(),
-          );
-          if (learned) {
-            expense.tags = learned.tags;
-            expense.bucket = learned.bucket;
-          }
           statements.push(
             sql`insert into expenses(id,user_id,amount,description,tags,bucket,date) values(${expense.id},${userId},${expense.amount},${expense.description},${expense.tags},${expense.bucket},${expense.date}) on conflict(id) do update set amount=excluded.amount,date=excluded.date where expenses.user_id=${userId}`,
           );
