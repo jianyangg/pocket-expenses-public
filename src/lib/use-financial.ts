@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { defaultStatementInputs, type StatementInputs } from "./statements";
 export type FinancialSettings = {
+  investmentPlan?: import("./investment-plan").InvestmentPlan;
   includeSetup: boolean;
   openingMonth: string;
   inputs: Record<string, StatementInputs>;

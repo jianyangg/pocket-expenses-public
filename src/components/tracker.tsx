@@ -8,6 +8,7 @@ import QuickEntry from "./quick-entry";
 import BudgetSettings from "./budget-settings";
 import ExpenseList from "./expense-list";
 import ExpenseReview from "./expense-review";
+import InvestmentPlan from "./investment-plan";
 import MonthlyMoney from "./monthly-money";
 import InterfaceIcon from "./interface-icon";
 import SpendingTrends from "./spending-trends";
@@ -197,6 +198,9 @@ export default function Tracker() {
                 today={today}
               />
 
+              {finance.settings.investmentPlan ? (
+                <InvestmentPlan plan={finance.settings.investmentPlan} />
+              ) : null}
               <SpendingTrends
                 expenses={expenses}
                 month={month}

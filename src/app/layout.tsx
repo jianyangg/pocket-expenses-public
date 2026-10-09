@@ -7,6 +7,7 @@ import "./financial-report.css";
 import "./modal-controls.css";
 import "./chart-interactions.css";
 import "./bank-sync.css";
+import "./investment-plan.css";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
