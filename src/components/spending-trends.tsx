@@ -35,7 +35,7 @@ export default function SpendingTrends({
       </div>
       <div className="trend-surface">
         <div className="section-head">
-          <h2>Spending room over time</h2>
+          <h2>Monthly budget balance</h2>
           <strong>{money(points.at(-1)!.remaining)}</strong>
         </div>
         <InteractiveTrendChart

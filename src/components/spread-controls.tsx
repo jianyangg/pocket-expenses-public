@@ -15,10 +15,10 @@ export default function SpreadControls({
   return (
     <details className="spread-controls" open={value ? true : undefined}>
       <summary>
-        {value ? `Spread over ${value.months} months` : "Count this month"}
+        {value ? `Spread over ${value.months} months` : "Spread over months"}
       </summary>
       <label>
-        How to count this purchase
+        Charge this budget
         <select
           disabled={disabled}
           value={value?.kind ?? "now"}
@@ -33,9 +33,11 @@ export default function SpreadControls({
             )
           }
         >
-          <option value="now">Full amount this month</option>
-          <option value="prepaid">Spread a prepaid purchase</option>
-          <option value="asset">Depreciate a lasting item</option>
+          <option value="now">All in purchase month</option>
+          <option value="prepaid">Over months · prepaid or supplies</option>
+          <option value="asset">
+            Over months · lasting item (depreciation)
+          </option>
         </select>
       </label>
       {value ? (

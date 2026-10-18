@@ -6,51 +6,39 @@ export default function EnvelopeSummary({
   expenses,
   today,
   month,
-  onPlan,
 }: {
   envelopes: Envelopes;
   expenses: Expense[];
   today: string;
   month: string;
-  onPlan: () => void;
 }) {
   const p = spendingSummary(e, expenses, month, today);
   return (
-    <section className="envelope-summary">
-      <p className="available-label">
-        {p.netRemaining < 0
-          ? "Over this month’s budget"
-          : "Left in this month’s budget"}
-      </p>
+    <section className="envelope-summary" aria-label="Monthly budget balance">
+      <p className="available-label">This month’s budget balance</p>
       <strong
         className={"available-amount " + (p.netRemaining < 0 ? "negative" : "")}
       >
-        {money(Math.abs(p.netRemaining))}
+        {money(p.netRemaining)}
       </strong>
-      <p className="budget-summary-context">
-        All spending categories combined, including overspending.
-      </p>
       <div className="envelope-cards">
         <div>
-          <span>
-            {e.groceriesLeft < 0
-              ? "Groceries over budget"
-              : "Groceries left this month"}
-          </span>
+          <span>Groceries</span>
           <strong className={e.groceriesLeft < 0 ? "negative" : ""}>
-            {money(Math.abs(e.groceriesLeft))}
+            {money(e.groceriesLeft)}
           </strong>
+          <small>
+            {e.groceriesLeft < 0 ? "over budget" : "left this month"}
+          </small>
         </div>
         <div>
-          <span>
-            {e.discretionaryLeft < 0
-              ? "Shopping & dining over budget"
-              : "Shopping & dining left"}
-          </span>
+          <span>Shopping & dining</span>
           <strong className={e.discretionaryLeft < 0 ? "negative" : ""}>
-            {money(Math.abs(e.discretionaryLeft))}
+            {money(e.discretionaryLeft)}
           </strong>
-          <small>{money(e.limit)} monthly budget</small>
+          <small>
+            {e.discretionaryLeft < 0 ? "over budget" : "left this month"}
+          </small>
         </div>
       </div>
       {p.daysLeft ? (
@@ -60,42 +48,18 @@ export default function EnvelopeSummary({
           }
         >
           <div>
-            <span>Remaining for today</span>
+            <span>Left for today</span>
             <strong>{money(p.dailyRemaining ?? 0)}</strong>
           </div>
           <small>
-            {money(p.spentToday)} counted today · {money(p.allowance)} daily
-            budget
+            {money(p.spentToday)} spent ·{" "}
+            {p.netRemaining < 0
+              ? "Monthly budget exceeded"
+              : p.overToday > 0
+                ? money(p.overToday) + " over today’s allowance"
+                : money(p.allowance) + " allowance"}
           </small>
-          {p.overToday > 0 ? (
-            <small>{money(p.overToday)} over today’s budget.</small>
-          ) : null}
-          {p.netRemaining < 0 ? (
-            <small>
-              Your combined monthly budget is already exceeded. Groceries and
-              other category balances are shown above.
-            </small>
-          ) : (
-            <small>
-              Includes groceries, shopping, dining, transit, subscriptions and
-              refills.
-            </small>
-          )}
         </div>
-      ) : null}
-      {e.carry < 0 ? (
-        <p className="carry-note">
-          {money(-e.carry)} of earlier overspending is included in this month’s
-          shopping budget.
-        </p>
-      ) : null}
-      {e.discretionaryLeft < 0 ? (
-        <p className="carry-note">
-          Shopping overspending reduces future months’ shopping budgets.{" "}
-          <button className="quiet" onClick={onPlan}>
-            Edit budget
-          </button>
-        </p>
       ) : null}
     </section>
   );

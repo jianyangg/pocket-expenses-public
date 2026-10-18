@@ -134,7 +134,7 @@ export default function ExpenseList({
                         )
                       }
                     >
-                      Count now or spread
+                      Count this month / spread
                     </button>
                   ) : null}
                   <button

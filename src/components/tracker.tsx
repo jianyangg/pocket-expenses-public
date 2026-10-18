@@ -1,4 +1,6 @@
 "use client";
+import BudgetOutlook from "./budget-outlook";
+import { budgetOutlook } from "@/lib/budget-outlook";
 import { monthlyExpenses } from "@/lib/expense-allocation";
 import { useCallback, useRef, useState } from "react";
 import { budgetForMonth } from "@/lib/storage";
@@ -235,7 +237,6 @@ export default function Tracker() {
                 budget={budget}
                 expenses={monthlyExpenses(snapshot.expenses, month)}
                 envelopes={envelopes}
-                onPlan={() => setView("budget")}
                 busy={busy}
                 onSaveNote={updateNote}
                 includeSetup={finance.settings.includeSetup}
@@ -247,6 +248,15 @@ export default function Tracker() {
                   onReview={() => setView("review")}
                   onInvest={() => quickEntry.current?.open("investment")}
                   onRefund={() => quickEntry.current?.open("refund")}
+                />
+                <BudgetOutlook
+                  months={budgetOutlook(
+                    snapshot.budgets,
+                    snapshot.expenses,
+                    month,
+                    planning,
+                  )}
+                  onPlan={() => setView("budget")}
                 />
                 {bankReviews.length ? (
                   <p className="review-warning">

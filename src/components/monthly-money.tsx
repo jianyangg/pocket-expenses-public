@@ -18,7 +18,6 @@ export default function MonthlyMoney({
   includeSetup,
   month,
   today,
-  onPlan,
   children,
   onSaveNote,
   busy,
@@ -29,7 +28,6 @@ export default function MonthlyMoney({
   includeSetup: boolean;
   month: string;
   today: string;
-  onPlan: () => void;
   children?: React.ReactNode;
   onSaveNote: (id: string, note: string) => Promise<boolean>;
   busy: boolean;
@@ -50,7 +48,6 @@ export default function MonthlyMoney({
         expenses={expenses}
         month={month}
         today={today}
-        onPlan={onPlan}
       />
       {children}
       <div className="allocation-surface">

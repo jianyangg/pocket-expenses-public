@@ -1,3 +1,4 @@
+import { bankCategory } from "./category";
 import { possibleMatches } from "../purchase-matching";
 import { randomUUID } from "node:crypto";
 import type { Expense } from "../budget";
@@ -20,37 +21,16 @@ export function toExpense(t: BankTransaction): Expense | null {
   const amount = Math.round(t.amount * 100);
   if (!Number.isSafeInteger(amount) || Math.abs(amount) > 100000000)
     return null;
-  const bucket =
-    detailed === "FOOD_AND_DRINK_GROCERIES"
-      ? "groceries"
-      : rent || primary === "RENT_AND_UTILITIES"
-        ? "bill"
-        : primary === "TRANSPORTATION" &&
-            !detailed.includes("TAXIS") &&
-            !detailed.includes("CAR_RENTAL")
-          ? "bill"
-          : "discretionary";
-  const tag = rent
-    ? "rent"
-    : bucket === "groceries"
-      ? "groceries"
-      : primary === "FOOD_AND_DRINK"
-        ? "food"
-        : primary === "GENERAL_MERCHANDISE"
-          ? "shopping"
-          : primary === "ENTERTAINMENT"
-            ? "entertainment"
-            : primary === "TRANSPORTATION"
-              ? detailed.includes("PUBLIC_TRANSIT")
-                ? "transit"
-                : "transport"
-              : null;
+  const classification = rent
+    ? { bucket: "bill" as const, tags: ["rent"], reviewed: true }
+    : bankCategory(t);
   return {
     id: randomUUID(),
     amount,
     description: (t.merchant_name || t.name || "Bank purchase").slice(0, 300),
-    tags: tag ? [tag] : [],
-    bucket,
+    bucket: "discretionary",
+    tags: [],
+    ...classification,
     date: t.date,
   };
 }

@@ -786,3 +786,77 @@
     font-size: 11px;
   }
 }
+
+/* Secondary planning detail stays collapsed beneath the daily actions. */
+.budget-outlook {
+  margin: 16px 0;
+  border-block: 1px solid var(--line);
+}
+.budget-outlook > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  min-height: 48px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.budget-outlook > summary::after {
+  content: "⌄";
+  color: var(--muted);
+}
+.budget-outlook[open] > summary::after {
+  content: "⌃";
+}
+.budget-outlook > summary > span:nth-child(2) {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+  text-align: right;
+}
+.budget-outlook p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+.budget-outlook table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.budget-outlook th,
+.budget-outlook td {
+  padding: 12px 4px;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+}
+.budget-outlook th:first-child {
+  text-align: left;
+}
+.budget-outlook thead th {
+  color: var(--muted);
+  font-weight: 400;
+}
+.budget-outlook tbody th {
+  font-weight: 400;
+}
+.budget-outlook > button {
+  margin: 8px 0;
+  font-size: 12px;
+  color: #007aff;
+}
+@media (max-width: 420px) {
+  .budget-outlook > summary {
+    font-size: 12px;
+  }
+  .budget-outlook > summary > span:nth-child(2) {
+    max-width: 120px;
+    font-size: 11px;
+  }
+}

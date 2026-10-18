@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { money } from "@/lib/budget";
 import { chartIndex } from "@/lib/chart-interaction";
+import { trendScale } from "@/lib/trend-scale";
 export type TrendPoint = { date: string; value: number; opening?: boolean };
 export default function InteractiveTrendChart({
   points,
@@ -14,9 +15,8 @@ export default function InteractiveTrendChart({
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const count = points.length;
-  const floor = Math.min(0, ...points.map((p) => p.value)),
-    ceiling = Math.max(1, ...points.map((p) => p.value));
-  const y = (v: number) => 20 + (100 * (ceiling - v)) / (ceiling - floor);
+  const { y, zero } = trendScale(points.map((p) => p.value));
+  const clip = useId().replace(/:/g, "");
   const x = (index: number) =>
     kind === "bar"
       ? 10 + ((index + 0.5) * 300) / count
@@ -62,7 +62,7 @@ export default function InteractiveTrendChart({
           )
             setSelected(null);
         }}
-        onFocus={() => setSelected(count - 1)}
+        onFocus={() => setSelected((current) => current ?? count - 1)}
         onBlur={() => setSelected(null)}
         onKeyDown={(e) => {
           if (
@@ -88,13 +88,14 @@ export default function InteractiveTrendChart({
           }
         }}
       >
-        <line
-          x1="10"
-          x2="310"
-          y1={kind === "bar" ? y(0) : 120}
-          y2={kind === "bar" ? y(0) : 120}
-          stroke="#e5e5ea"
-        />
+        <defs>
+          <clipPath id={clip + "-positive"}>
+            <rect x="0" y="0" width="320" height={zero} />
+          </clipPath>
+          <clipPath id={clip + "-negative"}>
+            <rect x="0" y={zero} width="320" height={146 - zero} />
+          </clipPath>
+        </defs>
         {kind === "bar" ? (
           points.map((p, i) => (
             <rect
@@ -116,11 +117,19 @@ export default function InteractiveTrendChart({
         ) : (
           <>
             <polygon
-              points={`10,120 ${line} 310,120`}
+              points={`10,${zero} ${line} 310,${zero}`}
               fill="#007aff"
               opacity=".07"
+              clipPath={`url(#${clip}-positive)`}
+            />
+            <polygon
+              points={`10,${zero} ${line} 310,${zero}`}
+              fill="#b3372b"
+              opacity=".09"
+              clipPath={`url(#${clip}-negative)`}
             />
             <polyline
+              clipPath={`url(#${clip}-positive)`}
               points={line}
               fill="none"
               stroke="#007aff"
@@ -128,17 +137,46 @@ export default function InteractiveTrendChart({
               strokeLinejoin="round"
               strokeLinecap="round"
             />
+            <polyline
+              points={line}
+              fill="none"
+              stroke="#b3372b"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              clipPath={`url(#${clip}-negative)`}
+            />
             {points.map((p, i) => (
               <circle
                 key={i}
                 cx={x(i)}
                 cy={y(p.value)}
                 r={i === count - 1 ? 4 : 2}
-                fill="#007aff"
+                fill={p.value < 0 ? "#b3372b" : "#007aff"}
               />
             ))}
           </>
         )}
+        <line
+          x1="10"
+          x2="310"
+          y1={zero}
+          y2={zero}
+          stroke="#8e8e93"
+          strokeWidth=".6"
+          strokeDasharray="3 3"
+        />
+        <text
+          x="10"
+          y={zero - 4}
+          fill="#6e6e73"
+          fontSize="8"
+          stroke="white"
+          strokeWidth="2"
+          paintOrder="stroke"
+        >
+          $0
+        </text>
         {selected !== null ? (
           <g pointerEvents="none">
             <line
