@@ -132,52 +132,6 @@ export default function BankConnection({
               {pendingLink ? "Resume connection" : "Connect bank"}
             </button>
           )}
-          {state.reviews.length ? (
-            <details open>
-              <summary>
-                {state.reviews.length} possible duplicates to review
-              </summary>
-              <p className="hint">
-                These are not included in your balance yet. Skip if you already
-                entered the purchase.
-              </p>
-              {state.reviews.map((t) => (
-                <div className="bank-review" key={t.id}>
-                  <span>
-                    {t.description}
-                    <small>
-                      {t.date} · {money(t.amount)}
-                    </small>
-                  </span>
-                  <button
-                    disabled={busy}
-                    onClick={() =>
-                      void action({
-                        action: "review",
-                        id: t.id,
-                        choice: "include",
-                      })
-                    }
-                  >
-                    Add
-                  </button>
-                  <button
-                    className="quiet"
-                    disabled={busy}
-                    onClick={() =>
-                      void action({
-                        action: "review",
-                        id: t.id,
-                        choice: "ignore",
-                      })
-                    }
-                  >
-                    Skip
-                  </button>
-                </div>
-              ))}
-            </details>
-          ) : null}
         </>
       ) : (
         <p className="hint">

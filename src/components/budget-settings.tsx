@@ -9,6 +9,7 @@ const labels: Record<keyof Budget, string> = {
   subscriptions: "Monthly subscriptions",
   transit: "Transit allowance",
   groceries: "Groceries",
+  discretionary:"Discretionary spending",
   refills: "Toiletry & household refill savings",
   renewals: "Annual renewal savings",
   depreciation: "Past purchases: monthly depreciation",

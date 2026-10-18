@@ -6,10 +6,18 @@ export const buckets = [
   "fixed",
   "reserved",
   "review",
+  "transfer",
 ] as const;
 export type Bucket = (typeof buckets)[number];
 export type Expense = {
   reviewed?: boolean;
+  source?: "manual" | "bank" | "matched";
+  pending?: boolean;
+  canUndoMatch?: boolean;
+  accountId?: string;
+  payment?: "card" | "cash";
+  settled?: boolean;
+  refundOf?: string | null;
   spread?: import("./expense-schedule").ExpenseSpread | null;
   id: string;
   amount: number;
@@ -26,6 +34,7 @@ export type Budget = {
   subscriptions: number;
   transit: number;
   groceries: number;
+  discretionary: number;
   refills: number;
   renewals: number;
   depreciation: number;
@@ -39,6 +48,7 @@ export const defaultBudget: Budget = {
   subscriptions: 0,
   transit: 0,
   groceries: 0,
+  discretionary: 0,
   refills: 0,
   renewals: 0,
   depreciation: 0,

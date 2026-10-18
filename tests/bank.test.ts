@@ -58,7 +58,7 @@ test("bank imports preserve cents, classify groceries and skip income and transf
   assert.equal(toExpense(txn({ amount: -12.5 }))?.amount, -1250);
   assert.equal(toExpense(txn({ amount: 0 })), null);
 });
-test("ambiguous manual duplicates need review; a merchant match can reuse an entry", () => {
+test("manual candidates always require confirmation before a bank purchase is merged", () => {
   const existing = {
     id: "manual",
     amount: 1250,
@@ -67,10 +67,7 @@ test("ambiguous manual duplicates need review; a merchant match can reuse an ent
     bucket: "discretionary" as const,
     date: "2026-10-07",
   };
-  assert.deepEqual(findDuplicate(txn(), [existing]), {
-    kind: "match",
-    id: "manual",
-  });
+  assert.deepEqual(findDuplicate(txn(), [existing]), {kind:"review"});
   assert.equal(
     findDuplicate(txn({ name: "Different merchant" }), [existing]).kind,
     "review",

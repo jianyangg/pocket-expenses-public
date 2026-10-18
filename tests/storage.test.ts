@@ -43,10 +43,7 @@ test("plans inherit the nearest earlier month, not a future plan", () => {
       .investing,
     60000,
   );
-  assert.equal(
-    budgetForMonth({ "2026-12": later }, "2026-10").investing,
-    0,
-  );
+  assert.equal(budgetForMonth({ "2026-12": later }, "2026-10").investing, 0);
   assert.equal(
     budgetForMonth({ "2026-09": earlier, "2026-12": later }, "2026-12")
       .investing,

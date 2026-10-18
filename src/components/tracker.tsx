@@ -1,14 +1,21 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
-import { budgetForMonth, downloadSnapshot } from "@/lib/storage";
+import { budgetForMonth } from "@/lib/storage";
 import { authClient } from "@/lib/auth/client";
 import { useTracker } from "@/lib/use-tracker";
 import Login from "./login";
-import QuickEntry from "./quick-entry";
+import QuickEntry, { type QuickEntryHandle } from "./quick-entry";
 import BudgetSettings from "./budget-settings";
 import ExpenseList from "./expense-list";
 import ExpenseReview from "./expense-review";
-import InvestmentPlan from "./investment-plan";
+import ActionStrip from "./action-strip";
+import BankMatchInbox from "./bank-match-inbox";
+import CashForecast from "./cash-forecast";
+import WeeklyInsights from "./weekly-insights";
+import SpendingPlanSettings from "./spending-plan-settings";
+import { useCash } from "@/lib/use-cash";
+import { needsReview } from "@/lib/review-queue";
+import { envelopesForMonth, type SpendingPlan } from "@/lib/spending-plan";
 import MonthlyMoney from "./monthly-money";
 import InterfaceIcon from "./interface-icon";
 import SpendingTrends from "./spending-trends";
@@ -16,6 +23,7 @@ import { moneyFlow } from "@/lib/money-flow";
 import FinancialStatements from "./financial-statements";
 import { useFinancial } from "@/lib/use-financial";
 import MoneySettings from "./money-settings";
+import TrackerTools from "./tracker-tools";
 
 export default function Tracker() {
   const {
@@ -41,11 +49,12 @@ export default function Tracker() {
     importFile,
   } = useTracker();
   const finance = useFinancial(Boolean(user));
+  const cash = useCash(Boolean(user));
+  const quickEntry = useRef<QuickEntryHandle>(null);
   const [showMoneySettings, setShowMoneySettings] = useState(false);
   const [view, setView] = useState<
     "overview" | "activity" | "review" | "statements" | "budget"
   >("overview");
-  const importInput = useRef<HTMLInputElement>(null);
   const refreshBank = useCallback(() => {
     void reload(true);
   }, [reload]);
@@ -57,6 +66,43 @@ export default function Tracker() {
     );
   if (!user) return <Login />;
   const budget = budgetForMonth(snapshot.budgets, month);
+  const planning: SpendingPlan = finance.settings.spendingPlan ?? {
+    startMonth:
+      finance.settings.investmentPlan?.asOf.slice(0, 7) ?? today.slice(0, 7),
+    through: finance.settings.investmentPlan?.through ?? today.slice(0, 7),
+    buffer: finance.settings.investmentPlan?.buffer ?? 0,
+    carryPositive: false,
+    paidEssentials: {},
+  };
+  const envelopes = envelopesForMonth(
+    snapshot.budgets,
+    snapshot.expenses,
+    month,
+    planning,
+  );
+  const bankReviews = snapshot.bankReviews ?? [];
+  const reviewCount =
+    bankReviews.length + snapshot.expenses.filter(needsReview).length;
+  async function resolve(body: Record<string, unknown>) {
+    try {
+      const r = await fetch("/api/reconcile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) {
+        const error = await r.json();
+        throw Error(error.error);
+      }
+      await reload(true);
+      void cash.refresh();
+      return true;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save this decision");
+      return false;
+    }
+  }
+
   const expenses = snapshot.expenses.filter((e) => e.date.startsWith(month));
   const monthName = new Date(month + "-01T12:00:00").toLocaleDateString(
     "en-US",
@@ -143,6 +189,7 @@ export default function Tracker() {
             ) : null}
           </div>
           <QuickEntry
+            ref={quickEntry}
             expenses={snapshot.expenses}
             key={editing?.id ?? "new"}
             onSave={add}
@@ -151,32 +198,24 @@ export default function Tracker() {
             onCancel={editing ? () => setEditing(undefined) : undefined}
           />
           <nav className="dashboard-tabs" aria-label="Dashboard sections">
-            {(
-              [
-                "overview",
-                "review",
-                "activity",
-                "statements",
-                "budget",
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab}
-                aria-pressed={view === tab}
-                onClick={() => setView(tab)}
-              >
-                <InterfaceIcon name={tab} />
-                {tab === "overview"
-                  ? "Overview"
-                  : tab === "activity"
-                    ? "Expenses"
-                    : tab === "review"
-                      ? "Categorize"
-                      : tab === "statements"
-                        ? "Statements"
-                        : "Budget"}
-              </button>
-            ))}
+            {(["overview", "review", "activity", "budget"] as const).map(
+              (tab) => (
+                <button
+                  key={tab}
+                  aria-pressed={view === tab}
+                  onClick={() => setView(tab)}
+                >
+                  <InterfaceIcon name={tab} />
+                  {tab === "overview"
+                    ? "Today"
+                    : tab === "activity"
+                      ? "Activity"
+                      : tab === "review"
+                        ? "Review"
+                        : "Plan"}
+                </button>
+              ),
+            )}
           </nav>
           {view === "statements" ? (
             <FinancialStatements
@@ -193,33 +232,73 @@ export default function Tracker() {
               <MonthlyMoney
                 budget={budget}
                 expenses={expenses}
+                envelopes={envelopes}
+                onPlan={() => setView("budget")}
                 includeSetup={finance.settings.includeSetup}
                 month={month}
                 today={today}
+              >
+                <ActionStrip
+                  count={reviewCount}
+                  onReview={() => setView("review")}
+                  onInvest={() => quickEntry.current?.open("investment")}
+                  onRefund={() => quickEntry.current?.open("refund")}
+                />
+                {bankReviews.length ? (
+                  <p className="review-warning">
+                    Spending totals are provisional until possible duplicates
+                    are resolved.
+                  </p>
+                ) : null}
+                {finance.ready ? (
+                  <CashForecast
+                    budgets={snapshot.budgets}
+                    expenses={snapshot.expenses}
+                    plan={planning}
+                    cash={cash.cash}
+                    loading={cash.loading}
+                    error={cash.error}
+                    today={today}
+                    duplicateCount={bankReviews.length}
+                    busy={busy}
+                    onEdit={setEditing}
+                    onConfirmPaid={(e) => void add({ ...e, settled: true })}
+                    onRefresh={() => void cash.refresh()}
+                    onPlan={() => setView("budget")}
+                  />
+                ) : null}
+              </MonthlyMoney>
+              <WeeklyInsights
+                expenses={snapshot.expenses}
+                today={today}
+                onEdit={setEditing}
               />
-
-              {finance.settings.investmentPlan ? (
-                <InvestmentPlan plan={finance.settings.investmentPlan} />
-              ) : null}
               <SpendingTrends
-                expenses={expenses}
+                expenses={expenses.filter((e) => e.bucket !== "investment")}
                 month={month}
                 today={today}
                 starting={
-                  moneyFlow(budget, expenses, finance.settings.includeSetup)
-                    .starting
+                  budget.groceries +
+                  budget.discretionary +
+                  budget.subscriptions +
+                  budget.transit +
+                  budget.refills +
+                  budget.renewals +
+                  envelopes.carry
                 }
               />
             </>
           ) : null}
-
           {view === "review" ? (
-            <ExpenseReview
-              expenses={snapshot.expenses}
-              today={today}
-              busy={busy}
-              onSave={add}
-            />
+            <>
+              <BankMatchInbox reviews={bankReviews} onResolve={resolve} />
+              <ExpenseReview
+                expenses={snapshot.expenses}
+                today={today}
+                busy={busy}
+                onSave={add}
+              />
+            </>
           ) : null}
           <div className="content-grid">
             {view === "activity" ? (
@@ -230,10 +309,23 @@ export default function Tracker() {
                   setEditing(e);
                 }}
                 onDelete={(e) => void deleteEntry(e)}
+                onUndoMatch={(id) =>
+                  void resolve({ action: "undo", expenseId: id })
+                }
               />
             ) : null}
             {view === "budget" ? (
               <div className="sidebar">
+                <SpendingPlanSettings
+                  settings={finance.settings}
+                  plan={planning}
+                  budget={budget}
+                  month={month}
+                  onSave={finance.save}
+                />
+                <button className="quiet" onClick={() => setView("statements")}>
+                  View financial statements
+                </button>
                 <BudgetSettings
                   initiallyOpen
                   budget={budget}
@@ -245,69 +337,12 @@ export default function Tracker() {
             ) : null}
           </div>
           {view === "budget" ? (
-            <footer>
-              <div>
-                <button
-                  className="quiet"
-                  disabled={busy}
-                  onClick={() => {
-                    const raw = localStorage.getItem("pocket-expenses-v1");
-                    if (!raw) {
-                      setError("No previous browser entries found.");
-                      return;
-                    }
-                    void importFile(
-                      new File([raw], "browser-entries.json", {
-                        type: "application/json",
-                      }),
-                    );
-                  }}
-                >
-                  Import browser entries
-                </button>
-                {user ? (
-                  <button
-                    className="quiet"
-                    disabled={busy}
-                    onClick={async () => {
-                      const { error } = await authClient.signOut();
-                      if (error)
-                        setError(error.message ?? "Could not sign out.");
-                    }}
-                  >
-                    Sign out
-                  </button>
-                ) : (
-                  <span className="mode">Local only</span>
-                )}
-
-                <button
-                  className="quiet"
-                  onClick={() => downloadSnapshot(snapshot)}
-                >
-                  Export for analysis
-                </button>
-                <button
-                  className="quiet"
-                  disabled={busy}
-                  onClick={() => importInput.current?.click()}
-                >
-                  Import backup
-                </button>
-                <input
-                  ref={importInput}
-                  type="file"
-                  accept="application/json,.json"
-                  className="sr-only"
-                  aria-label="Import Pocket export"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) void importFile(f);
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-            </footer>
+            <TrackerTools
+              snapshot={snapshot}
+              busy={busy}
+              importFile={importFile}
+              setError={setError}
+            />
           ) : null}
         </>
       )}

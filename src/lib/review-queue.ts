@@ -1,4 +1,13 @@
 import type { Expense } from "./budget";
+export function needsReview(e: Expense) {
+  return (
+    !e.reviewed &&
+    (!e.source ||
+      e.source === "bank" ||
+      e.bucket === "review" ||
+      !e.tags.length)
+  );
+}
 export function reviewQueue(
   expenses: Expense[],
   start: string,
@@ -14,7 +23,7 @@ export function reviewQueue(
         e.date >= start &&
         e.date <= end &&
         !done.has(e.id) &&
-        !e.reviewed &&
+        needsReview(e) &&
         (!untagged || !e.tags.length),
     )
     .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));

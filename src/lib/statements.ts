@@ -26,7 +26,7 @@ export function financialStatements(
   const spending =
     scheduled.prepaidPurchases +
     rows
-      .filter((e) => !["investment", "fixed"].includes(e.bucket))
+      .filter((e) => !["investment", "fixed", "transfer"].includes(e.bucket))
       .reduce((n, e) => n + e.amount, 0);
   const investments = rows
     .filter((e) => e.bucket === "investment")

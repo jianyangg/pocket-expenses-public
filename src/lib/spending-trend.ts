@@ -19,7 +19,8 @@ export function spendingTrend(
       date = month + "-" + String(day).padStart(2, "0");
     const rows = expenses.filter(
       (e) =>
-        e.date === date && !["essential", "setup"].includes(expenseCategory(e)),
+        e.date === date &&
+        !["essential", "setup", "transfer"].includes(expenseCategory(e)),
     );
     const spent = rows
       .filter((e) => e.bucket !== "investment")

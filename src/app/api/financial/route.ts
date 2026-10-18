@@ -1,3 +1,4 @@
+import { validateSpendingPlan } from "@/lib/spending-plan";
 import { validateInvestmentPlan } from "@/lib/investment-plan";
 import { currentUser } from "@/lib/auth/server";
 import { bankQuery } from "@/lib/bank/store";
@@ -46,12 +47,15 @@ export async function POST(request: Request) {
           throw Error();
       }
     }
+    const investmentPlan = validateInvestmentPlan(body.investmentPlan);
     await bankQuery(
       user,
       "insert into financial_settings(user_id,values) values($1,$2::jsonb) on conflict(user_id) do update set values=excluded.values",
       [
         user,
         JSON.stringify({
+          investmentPlan,
+          spendingPlan: validateSpendingPlan(body.spendingPlan),
           includeSetup: body.includeSetup,
           inputs: body.inputs,
           openingMonth: body.openingMonth,

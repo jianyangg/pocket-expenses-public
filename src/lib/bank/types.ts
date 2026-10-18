@@ -8,6 +8,7 @@ export type BankTransaction = {
   merchant_name?: string | null;
   date: string;
   pending: boolean;
+  authorized_date?: string | null;
   personal_finance_category?: { primary: string; detailed: string } | null;
 };
 export type Connection = {
@@ -31,6 +32,8 @@ export type TransactionRecord = {
   customized: boolean;
   decision: string;
   data: BankTransaction;
+  undo_expense?: Expense | null;
+  duplicate_checked?: boolean;
 };
 export type SyncPage = {
   added: BankTransaction[];
@@ -41,3 +44,11 @@ export type SyncPage = {
 };
 export type ImportDecision =
   { kind: "new" | "review" } | { kind: "match"; id: Expense["id"] };
+
+export type DuplicateReview = {
+  bankId: string;
+  amount: number;
+  description: string;
+  date: string;
+  candidates: Expense[];
+};

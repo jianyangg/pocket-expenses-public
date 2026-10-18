@@ -19,19 +19,27 @@ export function inferCategory(expense: Expense, history: Expense[]): Expense {
   if (previous)
     return {
       ...expense,
+      reviewed: true,
       bucket: previous.bucket,
       tags: previous.tags.filter((t) => t !== "chase"),
     };
   const text = merchant(expense.description);
+  if (/rent payment|landlord/.test(text))
+    return { ...expense, bucket: "bill", tags: ["rent"], reviewed: true };
   if (/\binsurance\b/.test(text))
-    return { ...expense, bucket: "bill", tags: ["insurance"] };
+    return { ...expense, reviewed: true, bucket: "bill", tags: ["insurance"] };
   if (/\b(coned|con ed|consolidated edison|electricity|internet)\b/.test(text))
-    return { ...expense, bucket: "bill", tags: ["utilities"] };
+    return { ...expense, reviewed: true, bucket: "bill", tags: ["utilities"] };
   if (/\b(mta|subway|metrocard)\b/.test(text))
-    return { ...expense, bucket: "bill", tags: ["transit"] };
+    return { ...expense, reviewed: true, bucket: "bill", tags: ["transit"] };
   if (
     /\b(amazon prime|prime video|openai|chatgpt|spotify|netflix)\b/.test(text)
   )
-    return { ...expense, bucket: "bill", tags: ["subscriptions"] };
+    return {
+      ...expense,
+      reviewed: true,
+      bucket: "bill",
+      tags: ["subscriptions"],
+    };
   return expense;
 }

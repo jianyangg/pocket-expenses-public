@@ -67,6 +67,7 @@ export function financialReport(
       account("Shopping and dining", -amount("shopping")),
       account("Subscriptions", -amount("subscriptions")),
       account("Transit", -amount("transit")),
+      account("Household refills and renewals", -amount("refills")),
       account("Depreciation of setup assets", -p.depreciation),
       subtotal(
         "Total expenses",

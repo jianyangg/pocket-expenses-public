@@ -1,8 +1,10 @@
 import type { Budget, Expense } from "./budget";
 export function expenseCategory(e: Expense) {
   const text = (e.description + " " + e.tags.join(" ")).toLowerCase();
+  if (e.bucket === "transfer") return "transfer";
   if (e.bucket === "investment") return "investments";
   if (e.bucket === "fixed" && !e.spread) return "setup";
+  if (e.bucket === "reserved") return "refills";
   if (e.bucket === "groceries") return "groceries";
   if (
     e.tags.some((tag) =>
@@ -40,6 +42,7 @@ export function moneyFlow(
     (includeSetup ? b.depreciation : 0);
   const totals = {
     groceries: 0,
+    refills: 0,
     subscriptions: 0,
     transit: 0,
     shopping: 0,

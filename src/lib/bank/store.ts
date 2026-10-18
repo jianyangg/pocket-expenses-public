@@ -48,7 +48,7 @@ export async function records(
 ): Promise<TransactionRecord[]> {
   return (await bankQuery(
     userId,
-    "select transaction_id,expense_id,owned,customized,decision,data from bank_transactions where user_id=$1 and item_id=$2",
+    "select transaction_id,expense_id,owned,customized,decision,data,undo_expense,duplicate_checked from bank_transactions where user_id=$1 and item_id=$2",
     [userId, item],
   )) as TransactionRecord[];
 }

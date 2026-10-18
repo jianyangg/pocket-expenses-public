@@ -35,12 +35,12 @@ export default function SpendingTrends({
       </div>
       <div className="trend-surface">
         <div className="section-head">
-          <h2>Available over time</h2>
+          <h2>Spending room over time</h2>
           <strong>{money(points.at(-1)!.remaining)}</strong>
         </div>
         <InteractiveTrendChart
           kind="line"
-          label="Remaining balance after spending and investments"
+          label="Everyday budget remaining after purchases and refunds"
           points={[
             { date: month + "-01", value: starting, opening: true },
             ...points.map((p) => ({ date: p.date, value: p.remaining })),

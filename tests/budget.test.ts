@@ -1,10 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  calculatePlan,
-  parseEntry,
-  type Expense,
-} from "../src/lib/budget";
+import { calculatePlan, parseEntry, type Expense } from "../src/lib/budget";
 import { sampleBudget } from "./fixtures";
 const expense = (
   amount: number,
@@ -26,7 +22,7 @@ test("current budget reserves investing without treating depreciation as cash", 
 test("bills and investing entries are not deducted twice; refunds restore budgets", () => {
   const p = calculatePlan(
     sampleBudget,
-      [
+    [
       expense(1000, "discretionary"),
       expense(-200, "discretionary"),
       expense(150000, "bill"),
@@ -43,7 +39,7 @@ test("bills and investing entries are not deducted twice; refunds restore budget
 test("daily guide uses remaining calendar days including today, and shows overspending", () => {
   const p = calculatePlan(
     sampleBudget,
-      [expense(47000, "discretionary")],
+    [expense(47000, "discretionary")],
     "2026-10",
     "2026-10-31",
   );
@@ -64,7 +60,7 @@ test("parses cents and multiple unique lowercase hashtags", () => {
 test("grocery overspending reduces the daily guide instead of hiding the shortfall", () => {
   const p = calculatePlan(
     sampleBudget,
-      [expense(41000, "groceries")],
+    [expense(41000, "groceries")],
     "2026-10",
     "2026-10-31",
   );
@@ -91,7 +87,7 @@ test("past fixed purchases and reserved refills are separate; review spending re
   };
   const plan = calculatePlan(
     sampleBudget,
-      [
+    [
       { ...base, amount: 10000, bucket: "fixed" },
       { ...base, amount: 5000, bucket: "reserved" },
       { ...base, amount: 1000, bucket: "review" },

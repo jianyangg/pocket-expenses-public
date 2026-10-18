@@ -9,7 +9,7 @@ import {
   signingKey,
 } from "./store";
 import { inferCategory } from "../infer-category";
-import { toExpense, findDuplicate } from "./transactions";
+import { toExpense, findDuplicate, investmentCandidate } from "./transactions";
 import type { SyncPage, BankTransaction, TransactionRecord } from "./types";
 export async function syncBank(
   userId: string,
@@ -68,7 +68,13 @@ export async function syncBank(
       const recordMap = new Map(existing.map((r) => [r.transaction_id, r]));
       const snapshot = await readSnapshot(userId);
       const bankIds = new Set(existing.map((r) => r.expense_id));
-      const candidates = snapshot.expenses.filter((e) => !bankIds.has(e.id));
+      const candidates = snapshot.expenses.filter(
+        (e) =>
+          !bankIds.has(e.id) &&
+          e.source !== "bank" &&
+          e.source !== "matched" &&
+          e.payment !== "cash",
+      );
       const sql = database();
       const statements = [];
       const retainedIds = new Set<string>();
@@ -78,7 +84,7 @@ export async function syncBank(
           (t.pending_transaction_id
             ? recordMap.get(t.pending_transaction_id)
             : undefined);
-        const rawExpense = toExpense(t);
+        const rawExpense = toExpense(t) ?? investmentCandidate(t, candidates);
         const expense = rawExpense
           ? inferCategory(rawExpense, snapshot.expenses)
           : null;
@@ -86,6 +92,7 @@ export async function syncBank(
         let owned = previous?.owned || false;
         let decision = previous?.decision || "imported";
         const customized = previous?.customized || false;
+        const undoExpense = previous?.undo_expense ?? null;
         if (!previous) {
           if (t.date < item.start_date || !expense) decision = "ignored";
           else {
@@ -115,6 +122,10 @@ export async function syncBank(
             sql`insert into expenses(id,user_id,amount,description,tags,bucket,date) values(${expense.id},${userId},${expense.amount},${expense.description},${expense.tags},${expense.bucket},${expense.date}) on conflict(id) do update set amount=excluded.amount,date=excluded.date where expenses.user_id=${userId}`,
           );
         }
+        if (decision === "imported" && expenseId && !owned)
+          statements.push(
+            sql`update expenses set amount=${Math.round(t.amount * 100)},date=${t.date} where id=${expenseId} and user_id=${userId}`,
+          );
         const record: TransactionRecord = {
           transaction_id: t.transaction_id,
           expense_id: expenseId,
@@ -122,10 +133,12 @@ export async function syncBank(
           customized,
           decision,
           data: t,
+          undo_expense: undoExpense,
+          duplicate_checked: previous?.duplicate_checked ?? false,
         };
         recordMap.set(t.transaction_id, record);
         statements.push(
-          sql`insert into bank_transactions(user_id,item_id,transaction_id,expense_id,owned,customized,decision,data) values(${userId},${item.item_id},${t.transaction_id},${expenseId},${owned},${customized},${decision},${JSON.stringify(t)}::jsonb) on conflict(transaction_id) do update set data=excluded.data,active=true,expense_id=excluded.expense_id,owned=excluded.owned,customized=excluded.customized,decision=excluded.decision where bank_transactions.user_id=${userId}`,
+          sql`insert into bank_transactions(user_id,item_id,transaction_id,expense_id,owned,customized,decision,data,undo_expense,duplicate_checked) values(${userId},${item.item_id},${t.transaction_id},${expenseId},${owned},${customized},${decision},${JSON.stringify(t)}::jsonb,nullif(${JSON.stringify(undoExpense)}::jsonb,'null'::jsonb),${previous?.duplicate_checked ?? false}) on conflict(transaction_id) do update set data=excluded.data,active=true,expense_id=excluded.expense_id,owned=excluded.owned,customized=excluded.customized,decision=excluded.decision,undo_expense=excluded.undo_expense,duplicate_checked=excluded.duplicate_checked where bank_transactions.user_id=${userId}`,
         );
       }
       for (const id of removed) {

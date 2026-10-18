@@ -6,6 +6,7 @@ export const sampleBudget = {
   subscriptions: 2000,
   transit: 8000,
   groceries: 40000,
+  discretionary: 0,
   refills: 3000,
   renewals: 1000,
   depreciation: 10000,

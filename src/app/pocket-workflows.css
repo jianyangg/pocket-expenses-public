@@ -1,0 +1,492 @@
+/* Everyday actions share one spacing scale and minimum touch targets. */
+.dashboard-tabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.action-strip {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 22px;
+}
+.action-strip > button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 13px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  min-height: 48px;
+}
+.action-strip > button > span {
+  display: grid;
+  place-items: center;
+  background: #ffffff30;
+  border-radius: 7px;
+  min-width: 24px;
+  height: 24px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.action-strip > button > b {
+  margin-left: auto;
+  font-size: 22px;
+  font-weight: 400;
+}
+.action-strip > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.action-strip .quiet {
+  background: #eaeaef;
+  color: var(--ink);
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 12px;
+  padding: 12px;
+}
+.envelope-summary {
+  padding: 8px 0 0;
+}
+.envelope-summary .available-amount {
+  font-size: clamp(44px, 9vw, 68px);
+  margin: 8px 0 20px;
+}
+.envelope-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.envelope-cards > div {
+  background: white;
+  border-radius: 18px;
+  padding: 18px;
+  min-width: 0;
+}
+.envelope-cards span,
+.envelope-cards small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.envelope-cards strong {
+  display: block;
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+  margin: 9px 0 5px;
+  font-variant-numeric: tabular-nums;
+}
+.today-pace {
+  background: #e7f0ff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 12px;
+  color: #0059be;
+}
+.today-pace > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+}
+.today-pace strong {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+  font-variant-numeric: tabular-nums;
+}
+.today-pace small {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.today-pace.over {
+  background: #fff0ed;
+  color: #b3372b;
+}
+.carry-note,
+.review-warning {
+  color: #8f5100;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 12px 14px;
+  background: #fff4df;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+.carry-note button {
+  font-size: 12px;
+  padding: 6px;
+  color: #007aff;
+}
+.forecast-card,
+.weekly-insights,
+.match-inbox,
+.plan-reserves {
+  padding: 22px;
+  margin: 20px 0;
+  border-radius: 20px;
+}
+.forecast-card .section-head,
+.weekly-insights .section-head,
+.match-inbox .section-head {
+  align-items: center;
+  margin-bottom: 12px;
+}
+.forecast-card h2,
+.weekly-insights h2,
+.match-inbox h2,
+.plan-reserves h2 {
+  font-size: 16px;
+  letter-spacing: -0.3px;
+}
+.forecast-card .section-head button {
+  font-size: 12px;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: #007aff;
+}
+.forecast-amount {
+  display: block;
+  font-size: 36px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+  font-variant-numeric: tabular-nums;
+}
+.forecast-card .hint,
+.weekly-insights .hint,
+.match-inbox .hint,
+.plan-reserves .hint {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 10px 0;
+}
+.forecast-invested {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+  padding-top: 14px;
+  font-size: 12px;
+}
+.forecast-invested span {
+  color: var(--muted);
+}
+.forecast-card summary,
+.plan-reserves summary {
+  min-height: 44px;
+  padding: 13px 0;
+  font-size: 12px;
+  cursor: pointer;
+  color: #007aff;
+}
+.forecast-card dl,
+.commitment-list {
+  display: grid;
+  gap: 10px;
+  font-size: 12px;
+  margin: 4px 0 14px;
+}
+.forecast-card dl > div,
+.forecast-month,
+.commitment-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.forecast-card dd,
+.commitment-list dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.forecast-card small {
+  color: var(--muted);
+  font-size: 11px;
+  display: block;
+  margin: 12px 0;
+}
+.forecast-month {
+  font-size: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.forecast-card details > .quiet {
+  font-size: 12px;
+  min-height: 44px;
+  color: #007aff;
+  padding: 12px 0;
+}
+.weekly-insights details {
+  border-top: 1px solid var(--line);
+}
+.weekly-insights summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+.weekly-insights summary strong::after {
+  content: " ›";
+  color: var(--muted);
+}
+.weekly-insights ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.weekly-insights li button {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  min-height: 44px;
+  padding: 10px 0;
+  width: 100%;
+  text-align: left;
+  font-size: 12px;
+  color: var(--ink);
+}
+.weekly-insights li small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.repeat-note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 16px;
+}
+.match-inbox .section-head > span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.match-bank,
+.match-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  margin: 10px 0;
+  width: 100%;
+  text-align: left;
+}
+.match-bank {
+  background: #f2f2f7;
+}
+.match-option {
+  background: #edf4ff;
+  color: var(--ink);
+  border: 1px solid #dbe8ff;
+  min-height: 64px;
+  font-weight: 400;
+}
+.match-bank span,
+.match-option span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.match-bank small,
+.match-option small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 5px;
+}
+.match-option strong {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: #007aff;
+  font-weight: 600;
+}
+.match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.match-actions button {
+  min-height: 44px;
+  font-size: 12px;
+  border-radius: 10px;
+  padding: 12px;
+}
+.match-actions .quiet {
+  background: #f2f2f7;
+  color: var(--muted);
+}
+.duplicate-choice h3 {
+  font-size: 18px;
+}
+.duplicate-choice > .quiet {
+  font-size: 12px;
+  min-height: 44px;
+  width: 100%;
+  color: #007aff;
+}
+.entry-kinds {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  background: #f2f2f7;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+.entry-kinds button {
+  background: transparent;
+  color: var(--muted);
+  min-height: 36px;
+  font-size: 12px;
+  padding: 6px;
+  border-radius: 7px;
+}
+.entry-kinds button[aria-pressed="true"] {
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 1px 3px #00000010;
+}
+.refund-link {
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.refund-link select {
+  font-size: 16px;
+}
+.entry-state {
+  font-size: 11px !important;
+  color: #007aff !important;
+  margin: 4px 0 !important;
+}
+.plan-reserves h2 {
+  margin-bottom: 18px;
+}
+.plan-reserves label {
+  font-size: 12px;
+}
+.plan-reserves .inline-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin: 14px 0 4px;
+}
+.inline-check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+.plan-reserves > form > button {
+  margin-top: 16px;
+  min-height: 44px;
+}
+.plan-reserves small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 6px;
+}
+@media (max-width: 600px) {
+  .forecast-card,
+  .weekly-insights,
+  .match-inbox,
+  .plan-reserves {
+    padding: 20px 18px;
+  }
+  .envelope-cards {
+    gap: 10px;
+  }
+  .envelope-cards > div {
+    padding: 16px 14px;
+  }
+  .envelope-cards strong {
+    font-size: 23px;
+  }
+  .dashboard-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .match-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .forecast-amount {
+    font-size: 34px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .entry-kinds button,
+  .match-option,
+  .action-strip button {
+    transition:
+      background 0.15s ease,
+      transform 0.15s ease;
+  }
+  .match-option:active,
+  .action-strip button:active {
+    transform: scale(0.985);
+  }
+}
+
+.manual-reserve-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  padding: 8px 0;
+}
+.manual-reserve-row button {
+  min-height: 44px;
+  font-size: 12px;
+  text-align: left;
+  color: var(--ink);
+  padding: 8px 0;
+}
+.manual-reserve-row button:last-child {
+  color: #007aff;
+  flex-shrink: 0;
+}
+.expense-dialog .inline-check {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 44px;
+}
+.subscription-change {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 44px;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 12px 0;
+  color: #9c5300;
+}

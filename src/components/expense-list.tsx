@@ -1,17 +1,19 @@
 "use client";
 import { useState } from "react";
 import { money, type Expense } from "@/lib/budget";
-import { bucketLabels } from "./quick-entry";
+import { bucketLabels } from "@/lib/expense-labels";
 export default function ExpenseList({
   expenses,
   onEdit,
   onDelete,
   busy,
+  onUndoMatch,
 }: {
   expenses: Expense[];
   onEdit: (e: Expense) => void;
   onDelete: (e: Expense) => void;
   busy: boolean;
+  onUndoMatch?: (id: string) => void;
 }) {
   const [visible, setVisible] = useState(10);
   const [search, setSearch] = useState("");
@@ -52,6 +54,20 @@ export default function ExpenseList({
                   >
                     {e.description}
                   </button>
+                  <p className="entry-state">
+                    {e.source === "matched"
+                      ? "Matched"
+                      : e.source === "bank"
+                        ? e.pending
+                          ? "Bank pending"
+                          : "Bank confirmed"
+                        : e.payment === "cash"
+                          ? "Cash"
+                          : e.settled
+                            ? "Manual · paid"
+                            : "Manual estimate"}
+                    {e.refundOf ? " · linked refund" : ""}
+                  </p>
                   <p>
                     {new Date(e.date + "T12:00:00").toLocaleDateString(
                       "en-US",
@@ -81,6 +97,15 @@ export default function ExpenseList({
                   <strong className={e.amount < 0 ? "refund" : ""}>
                     {money(e.amount)}
                   </strong>
+                  {e.canUndoMatch && onUndoMatch ? (
+                    <button
+                      className="quiet"
+                      disabled={busy}
+                      onClick={() => onUndoMatch(e.id)}
+                    >
+                      Undo match
+                    </button>
+                  ) : null}
                   <button
                     className="quiet"
                     disabled={busy}

@@ -93,13 +93,13 @@ export function useTracker() {
       setBusy(false);
     }
   }
-  async function add(e: Expense) {
+  async function add(
+    e: Expense,
+    resolution?: { matchId?: string; separate?: boolean },
+  ) {
     return mutate(async () => {
-      await saveExpense(e, snapshot, user?.id);
-      setSnapshot((s) => ({
-        ...s,
-        expenses: [...s.expenses.filter((x) => x.id !== e.id), e],
-      }));
+      await saveExpense(e, snapshot, user?.id, resolution);
+      await reload(true);
       setEditing(undefined);
       setNotice("Saved.");
     });

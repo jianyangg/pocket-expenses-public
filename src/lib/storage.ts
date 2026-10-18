@@ -4,6 +4,7 @@ export type Snapshot = {
   version: 1;
   expenses: Expense[];
   budgets: Record<string, Budget>;
+  bankReviews?: import("./bank/types").DuplicateReview[];
 };
 export const emptySnapshot = (): Snapshot => ({
   version: 1,
@@ -29,6 +30,11 @@ export function validateSnapshot(input: unknown): Snapshot {
     if (
       !e ||
       (e.reviewed !== undefined && typeof e.reviewed !== "boolean") ||
+      (e.settled !== undefined && typeof e.settled !== "boolean") ||
+      (e.payment !== undefined && !["card", "cash"].includes(e.payment)) ||
+      (e.refundOf != null &&
+        (typeof e.refundOf !== "string" ||
+          !/^[0-9a-f-]{36}$/i.test(e.refundOf))) ||
       typeof e.id !== "string" ||
       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
         e.id,
@@ -50,6 +56,20 @@ export function validateSnapshot(input: unknown): Snapshot {
     ids.add(e.id);
   }
   for (const [month, b] of Object.entries(s.budgets)) {
+    if (b && typeof b === "object" && b.discretionary === undefined)
+      b.discretionary = Math.max(
+        0,
+        b.income -
+          b.rent -
+          b.utilities -
+          (b.insurance ?? 0) -
+          b.groceries -
+          b.transit -
+          b.subscriptions -
+          b.refills -
+          b.renewals -
+          b.investing,
+      );
     if (b && typeof b === "object" && b.insurance === undefined)
       b.insurance = 0;
     if (
@@ -102,8 +122,9 @@ export async function saveExpense(
   e: Expense,
   _snapshot: Snapshot,
   _userId?: string,
+  resolution?: { matchId?: string; separate?: boolean },
 ) {
-  await request("POST", { action: "expense", expense: e });
+  await request("POST", { action: "expense", expense: e, resolution });
 }
 export async function removeExpense(
   id: string,

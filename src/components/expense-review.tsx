@@ -14,6 +14,7 @@ const labels: Record<Bucket, string> = {
   fixed: "Fixed purchase",
   reserved: "Reserved refills",
   review: "Needs review",
+  transfer:"Between my accounts",
 };
 type Props = {
   expenses: Expense[];
@@ -28,11 +29,11 @@ export default function ExpenseReview({
   busy,
   onSave,
 }: Props) {
-  const [start, setStart] = useState(daysBefore(today, 2));
+  const [start, setStart] = useState("2000-01-01");
   const [end, setEnd] = useState(today);
   const [done, setDone] = useState<string[]>([]);
   const [history, setHistory] = useState<History[]>([]);
-  const [untagged, setUntagged] = useState(true);
+  const [untagged, setUntagged] = useState(false);
   const [working, setWorking] = useState(false);
   const lock = useRef(false);
   const queue = reviewQueue(expenses, start, end, done, untagged);
@@ -76,6 +77,7 @@ export default function ExpenseReview({
   return (
     <section className="review-panel">
       <div className="review-presets">
+        <button className="quiet" aria-pressed={start==="2000-01-01"} onClick={()=>{setStart("2000-01-01");setEnd(today);}}>All new</button>
         {[1, 3, 7].map((days) => (
           <button
             key={days}

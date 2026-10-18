@@ -8,6 +8,7 @@ const labels = {
   fixed: "Fixed purchases",
   reserved: "Refills & renewals",
   review: "Needs review",
+  transfer: "Transfers",
 };
 export function spendingSlices(expenses: Expense[]): ChartSlice[] {
   return buckets
