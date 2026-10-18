@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import BankTransactionDetails from "./bank-transaction-details";
 import { money } from "@/lib/budget";
 import type { DuplicateReview } from "@/lib/bank/types";
 export default function BankMatchInbox({
@@ -39,9 +40,13 @@ export default function BankMatchInbox({
         </span>
         <strong>{money(review.amount)}</strong>
       </div>
+      <BankTransactionDetails details={review.bankDetails} />
       {review.candidates.map((e) => (
         <button
-          className="match-option"
+          className={
+            "match-option" +
+            (review.candidates.length === 1 ? " match-option-primary" : "")
+          }
           disabled={busy}
           key={e.id}
           onClick={() =>
@@ -53,25 +58,32 @@ export default function BankMatchInbox({
           }
         >
           <span>
-            Match {e.description}
+            <strong className="match-option-action">
+              Same purchase · count once
+            </strong>
+            <span className="match-option-description">{e.description}</span>
             <small>
               {e.date} · your estimate {money(e.amount)}
             </small>
           </span>
-          <strong>Count once</strong>
         </button>
       ))}
       <div className="match-actions">
         <button
+          className={
+            review.candidates.length ? "quiet match-separate" : undefined
+          }
           disabled={busy}
           onClick={() =>
             void resolve({ action: "separate", bankId: review.bankId })
           }
         >
-          {review.candidates.length ? "Separate purchase" : "Add bank purchase"}
+          {review.candidates.length
+            ? "Different purchases · keep both"
+            : "Add bank purchase"}
         </button>
         <button
-          className="quiet"
+          className="quiet match-exclude"
           disabled={busy}
           onClick={() =>
             void resolve({ action: "ignore", bankId: review.bankId })

@@ -1,3 +1,4 @@
+import BankTransactionDetails from "./bank-transaction-details";
 import { money, type Expense } from "@/lib/budget";
 export default function DuplicateChoice({
   entry,
@@ -20,27 +21,36 @@ export default function DuplicateChoice({
         matching purchase once, using its bank amount.
       </p>
       {candidates.map((e) => (
-        <button
-          type="button"
-          className="match-option"
-          disabled={busy}
-          key={e.id}
-          onClick={() => onMatch(e.id)}
-        >
-          <span>
-            {e.description}
-            <small>{e.date} · Use bank amount</small>
-          </span>
-          <strong>{money(e.amount)}</strong>
-        </button>
+        <div key={e.id} className="duplicate-candidate">
+          <button
+            type="button"
+            className={
+              "match-option" +
+              (candidates.length === 1 ? " match-option-primary" : "")
+            }
+            disabled={busy}
+            onClick={() => onMatch(e.id)}
+          >
+            <span>
+              <strong className="match-option-action">
+                Same purchase · count once
+              </strong>
+              <span className="match-option-description">
+                {e.description} · {money(e.amount)}
+              </span>
+              <small>{e.date} · Use bank amount</small>
+            </span>
+          </button>
+          <BankTransactionDetails details={e.bankDetails} />
+        </div>
       ))}
       <button
         type="button"
-        className="quiet"
+        className="quiet match-separate"
         disabled={busy}
         onClick={onSeparate}
       >
-        Separate purchase · save mine too
+        Different purchases · keep both
       </button>
     </div>
   );

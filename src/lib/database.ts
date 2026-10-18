@@ -1,6 +1,8 @@
+import { withBankDetails } from "./bank/transaction-details";
 import { reviewCandidates } from "./bank/review-candidates";
 import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 import type { Expense } from "./budget";
+import type { BankTransaction } from "./bank/types";
 import type { Snapshot } from "./storage";
 let connection: NeonQueryFunction<false, false>;
 export function database() {
@@ -16,16 +18,19 @@ export async function readSnapshot(userId: string): Promise<Snapshot> {
     sql`select set_config('app.user_id', ${userId}, true)`,
     sql`select e.id,e.amount,e.description,e.tags,e.bucket,e.reviewed,e.spread,e.payment,e.settled,e.refund_of as "refundOf",to_char(e.date,'YYYY-MM-DD') as date,
  case when b.expense_id is null then 'manual' when b.undo_expense is not null or not b.owned then 'matched' else 'bank' end as source,
- (b.undo_expense is not null and b.undo_expense<>'null'::jsonb) as "canUndoMatch",coalesce((b.data->>'pending')::boolean,false) as pending,b.data->>'account_id' as "accountId"
+ (b.undo_expense is not null and b.undo_expense<>'null'::jsonb) as "canUndoMatch",coalesce((b.data->>'pending')::boolean,false) as pending,b.data->>'account_id' as "accountId",b.data as "bankData"
  from expenses e left join lateral(select expense_id,data,owned,undo_expense from bank_transactions where user_id=${userId} and expense_id=e.id and active=true order by (data->>'pending')::boolean limit 1)b on true where e.user_id=${userId} order by e.date,e.id`,
     sql`select month,plan from monthly_budgets where user_id=${userId}`,
     sql`select transaction_id,data,decision,owned,duplicate_checked from bank_transactions where user_id=${userId} and active=true and decision in ('review','ignored','imported') order by data->>'date' desc`,
   ]);
+  const entries = expenses.map((row) =>
+    withBankDetails(row as Expense & { bankData?: BankTransaction }),
+  );
   return {
     version: 1,
-    expenses: expenses as Expense[],
+    expenses: entries,
     bankReviews: reviewCandidates(
-      expenses as Expense[],
+      entries,
       bank as Parameters<typeof reviewCandidates>[1],
     ),
     budgets: Object.fromEntries(plans.map((p) => [p.month, p.plan])),

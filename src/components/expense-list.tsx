@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import BankTransactionDetails from "./bank-transaction-details";
 import { money, type Expense } from "@/lib/budget";
 import { bucketLabels } from "@/lib/expense-labels";
 export default function ExpenseList({
@@ -84,6 +85,12 @@ export default function ExpenseList({
                       · {e.spread.months} months ·{" "}
                       {money(Math.round(e.amount / e.spread.months))}/month
                     </p>
+                  ) : null}
+                  {e.bankDetails ? (
+                    <details className="activity-bank-context">
+                      <summary>Bank details</summary>
+                      <BankTransactionDetails details={e.bankDetails} />
+                    </details>
                   ) : null}
                   <div className="tags">
                     {e.tags.map((t) => (

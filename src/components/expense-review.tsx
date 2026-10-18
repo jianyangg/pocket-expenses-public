@@ -1,4 +1,5 @@
 "use client";
+import BankTransactionDetails from "./bank-transaction-details";
 import { useRef, useState } from "react";
 import { buckets, money, type Expense, type Bucket } from "@/lib/budget";
 import { reviewQueue, daysBefore, swipeAction } from "@/lib/review-queue";
@@ -14,7 +15,7 @@ const labels: Record<Bucket, string> = {
   fixed: "Fixed purchase",
   reserved: "Reserved refills",
   review: "Needs review",
-  transfer:"Between my accounts",
+  transfer: "Between my accounts",
 };
 type Props = {
   expenses: Expense[];
@@ -77,7 +78,16 @@ export default function ExpenseReview({
   return (
     <section className="review-panel">
       <div className="review-presets">
-        <button className="quiet" aria-pressed={start==="2000-01-01"} onClick={()=>{setStart("2000-01-01");setEnd(today);}}>All new</button>
+        <button
+          className="quiet"
+          aria-pressed={start === "2000-01-01"}
+          onClick={() => {
+            setStart("2000-01-01");
+            setEnd(today);
+          }}
+        >
+          All new
+        </button>
         {[1, 3, 7].map((days) => (
           <button
             key={days}
@@ -212,7 +222,12 @@ function ReviewCard({
         <div
           className="review-swipe-zone"
           onPointerDown={(e) => {
-            if (disabled || e.button !== 0) return;
+            if (
+              disabled ||
+              e.button !== 0 ||
+              (e.target as HTMLElement).closest("a, button, summary, details")
+            )
+              return;
             pointer.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
             e.currentTarget.setPointerCapture(e.pointerId);
           }}
@@ -241,6 +256,7 @@ function ReviewCard({
           <span className="review-date">{expense.date}</span>
           <h2>{expense.description}</h2>
           <strong className="review-amount">{money(expense.amount)}</strong>
+          <BankTransactionDetails details={expense.bankDetails} />
           <p className="hint">← Groceries · Shopping → · ↑ More</p>
         </div>
         <fieldset disabled={disabled} hidden={!options}>

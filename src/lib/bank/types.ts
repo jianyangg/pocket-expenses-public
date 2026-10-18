@@ -9,6 +9,20 @@ export type BankTransaction = {
   date: string;
   pending: boolean;
   authorized_date?: string | null;
+  original_description?: string | null;
+  payment_channel?: string | null;
+  website?: string | null;
+  location?: {
+    address?: string | null;
+    city?: string | null;
+    region?: string | null;
+    postal_code?: string | null;
+    country?: string | null;
+  } | null;
+  payment_meta?: {
+    payment_method?: string | null;
+    reference_number?: string | null;
+  } | null;
   personal_finance_category?: { primary: string; detailed: string } | null;
 };
 export type Connection = {
@@ -51,4 +65,5 @@ export type DuplicateReview = {
   description: string;
   date: string;
   candidates: Expense[];
+  bankDetails?: Expense["bankDetails"];
 };

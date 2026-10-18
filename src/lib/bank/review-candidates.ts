@@ -1,3 +1,4 @@
+import { transactionDetails } from "./transaction-details";
 import type { Expense } from "../budget";
 import { possibleMatches } from "../purchase-matching";
 import { investmentCandidate } from "./transactions";
@@ -43,6 +44,7 @@ export function reviewCandidates(
             date: purchase.date,
             description: purchase.description,
             candidates,
+            bankDetails: transactionDetails(data),
           },
         ]
       : [];

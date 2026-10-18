@@ -44,6 +44,7 @@ export async function syncBank(
                 access_token: unseal(item.token, signingKey()),
                 cursor,
                 count: 500,
+                options: { include_original_description: true },
               },
             );
             added.push(...response.added, ...response.modified);
