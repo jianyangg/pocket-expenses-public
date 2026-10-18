@@ -81,34 +81,14 @@
   margin: 9px 0 5px;
   font-variant-numeric: tabular-nums;
 }
-.today-pace {
-  background: #e7f0ff;
-  border-radius: 16px;
-  padding: 16px;
+.envelope-cards .category-pace {
+  border-top: 1px solid var(--line);
   margin-top: 12px;
+  padding-top: 10px;
   color: #0059be;
-}
-.today-pace > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  font-size: 13px;
-}
-.today-pace strong {
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: -0.6px;
-  font-variant-numeric: tabular-nums;
-}
-.today-pace small {
-  display: block;
-  margin-top: 8px;
   font-size: 11px;
-  line-height: 1.4;
 }
-.today-pace.over {
-  background: #fff0ed;
+.envelope-cards .category-pace.over {
   color: #b3372b;
 }
 .carry-note,

@@ -1,8 +1,9 @@
 "use client";
+import DayActivity from "./day-activity";
 import BudgetOutlook from "./budget-outlook";
 import { budgetOutlook } from "@/lib/budget-outlook";
 import { monthlyExpenses } from "@/lib/expense-allocation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { budgetForMonth } from "@/lib/storage";
 import { authClient } from "@/lib/auth/client";
 import { useTracker } from "@/lib/use-tracker";
@@ -59,6 +60,16 @@ export default function Tracker() {
   const [view, setView] = useState<
     "overview" | "activity" | "review" | "statements" | "budget"
   >("overview");
+  const [activityDate, setActivityDate] = useState<string | null>(null);
+  const returnToCharts = useRef(false);
+  useEffect(() => {
+    if (view === "overview" && returnToCharts.current) {
+      returnToCharts.current = false;
+      document
+        .getElementById("spending-trends")
+        ?.scrollIntoView({ block: "start" });
+    }
+  }, [view]);
   const refreshBank = useCallback(() => {
     void reload(true);
   }, [reload]);
@@ -137,6 +148,7 @@ export default function Tracker() {
               onChange={(e) => {
                 if (e.target.value) {
                   setMonth(e.target.value);
+                  setActivityDate(null);
                   setEditing(undefined);
                 }
               }}
@@ -207,7 +219,10 @@ export default function Tracker() {
                 <button
                   key={tab}
                   aria-pressed={view === tab}
-                  onClick={() => setView(tab)}
+                  onClick={() => {
+                    setActivityDate(null);
+                    setView(tab);
+                  }}
                 >
                   <InterfaceIcon name={tab} />
                   {tab === "overview"
@@ -290,6 +305,10 @@ export default function Tracker() {
                 busy={busy}
               />
               <SpendingTrends
+                onDateSelect={(date) => {
+                  setActivityDate(date);
+                  setView("activity");
+                }}
                 expenses={monthlyExpenses(snapshot.expenses, month).filter(
                   (e) => e.bucket !== "investment",
                 )}
@@ -319,8 +338,23 @@ export default function Tracker() {
               />
             </>
           ) : null}
+          {view === "activity" && activityDate ? (
+            <DayActivity
+              date={activityDate}
+              expenses={snapshot.expenses}
+              busy={busy}
+              onSaveNote={updateNote}
+              onEdit={setEditing}
+              onShowAll={() => setActivityDate(null)}
+              onBack={() => {
+                returnToCharts.current = true;
+                setActivityDate(null);
+                setView("overview");
+              }}
+            />
+          ) : null}
           <div className="content-grid">
-            {view === "activity" ? (
+            {view === "activity" && !activityDate ? (
               <ExpenseList
                 expenses={expenses}
                 busy={busy}

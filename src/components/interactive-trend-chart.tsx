@@ -1,19 +1,22 @@
 "use client";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { money } from "@/lib/budget";
-import { chartIndex } from "@/lib/chart-interaction";
+import { chartIndex, chartTap } from "@/lib/chart-interaction";
 import { trendScale } from "@/lib/trend-scale";
 export type TrendPoint = { date: string; value: number; opening?: boolean };
 export default function InteractiveTrendChart({
   points,
   kind,
   label,
+  onDateSelect,
 }: {
   points: TrendPoint[];
   kind: "bar" | "line";
   label: string;
+  onDateSelect?: (date: string) => void;
 }) {
   const [selected, setSelected] = useState<number | null>(null);
+  const tap = useRef<{ id: number; x: number; y: number } | null>(null);
   const count = points.length;
   const { y, zero } = trendScale(points.map((p) => p.value));
   const clip = useId().replace(/:/g, "");
@@ -26,45 +29,93 @@ export default function InteractiveTrendChart({
   function pick(event: React.PointerEvent<SVGSVGElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
     const local = ((event.clientX - bounds.left) / bounds.width) * 320;
-    setSelected(chartIndex((local - 10) / 300, count, kind));
+    const index = chartIndex((local - 10) / 300, count, kind);
+    setSelected(index);
+    return index;
   }
   return (
-    <div className="interactive-trend">
+    <div
+      className="interactive-trend"
+      onPointerLeave={(e) => {
+        if (
+          e.pointerType === "mouse" &&
+          !e.currentTarget.contains(document.activeElement)
+        )
+          setSelected(null);
+      }}
+    >
       <div className="trend-readout" aria-live="polite">
         {point ? (
           <>
-            <span>
+            <button
+              className="trend-date-link"
+              disabled={!onDateSelect || point.opening}
+              onClick={() => onDateSelect?.(point.date)}
+            >
               {point.opening
                 ? "Month start"
                 : new Date(point.date + "T12:00:00Z").toLocaleDateString(
                     "en-US",
                     { month: "short", day: "numeric", timeZone: "UTC" },
                   )}
-            </span>
+              {onDateSelect && !point.opening ? (
+                <span aria-hidden="true"> ›</span>
+              ) : null}
+            </button>
             <strong>{money(point.value)}</strong>
           </>
         ) : null}
       </div>
       <svg
         className="trend-chart"
+        data-drilldown={Boolean(onDateSelect)}
         viewBox="0 0 320 146"
         role="group"
         tabIndex={0}
-        aria-label={label + ". Use left and right arrow keys to inspect days."}
+        aria-label={
+          label +
+          ". Use left and right arrow keys to inspect days." +
+          (onDateSelect ? " Press Enter to open that day's transactions." : "")
+        }
         onPointerMove={(e) => {
           if (e.pointerType === "mouse" || e.buttons) pick(e);
         }}
-        onPointerDown={pick}
-        onPointerLeave={(e) => {
+        onPointerDown={(e) => {
+          if (e.button !== 0) return;
+          tap.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
+          pick(e);
+        }}
+        onPointerCancel={() => {
+          tap.current = null;
+        }}
+        onPointerUp={(e) => {
+          const start = tap.current;
+          tap.current = null;
           if (
-            e.pointerType === "mouse" &&
-            document.activeElement !== e.currentTarget
+            !start ||
+            start.id !== e.pointerId ||
+            !chartTap(start, { x: e.clientX, y: e.clientY })
           )
-            setSelected(null);
+            return;
+          const index = pick(e);
+          if (!points[index].opening) onDateSelect?.(points[index].date);
         }}
         onFocus={() => setSelected((current) => current ?? count - 1)}
-        onBlur={() => setSelected(null)}
+        onBlur={(e) => {
+          if (!e.currentTarget.parentElement?.contains(e.relatedTarget as Node))
+            setSelected(null);
+        }}
         onKeyDown={(e) => {
+          if (
+            (e.key === "Enter" || e.key === " ") &&
+            selected !== null &&
+            onDateSelect &&
+            !points[selected].opening
+          ) {
+            e.preventDefault();
+            onDateSelect(points[selected].date);
+            return;
+          }
           if (
             ["ArrowLeft", "ArrowRight", "Home", "End", "Escape"].includes(e.key)
           ) {

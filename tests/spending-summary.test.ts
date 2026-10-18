@@ -22,44 +22,63 @@ const purchase: Expense = {
   bucket: "discretionary",
   source: "bank",
 };
-test("monthly total includes negative categories instead of summing only unused budgets", () => {
+test("shopping overspending never removes the remaining grocery allowance", () => {
   const envelopes = envelopesForMonth(
     { "2026-10": b },
-    [{ ...purchase, amount: 50000 }],
+    [{ ...purchase, amount: 60000 }],
     "2026-10",
     plan,
   );
-  const summary = spendingSummary(envelopes, [], "2026-10", "2026-10-18");
-  assert.equal(summary.netRemaining, 0);
-  assert.equal(summary.dailyRemaining, 0);
-  const over = spendingSummary(
-    { ...envelopes, discretionaryLeft: -40000 },
-    [],
-    "2026-10",
-    "2026-10-18",
-  );
-  assert.equal(over.netRemaining, -10000);
-  assert.equal(over.dailyRemaining, 0);
+  const summary = spendingSummary(envelopes, [], "2026-10", "2026-10-22");
+  assert.equal(summary.netRemaining, -10000);
+  assert.equal(summary.groceries.monthlyRemaining, 30000);
+  assert.equal(summary.groceries.leftToday, 3000);
+  assert.equal(summary.shopping.monthlyRemaining, -40000);
+  assert.equal(summary.shopping.leftToday, null);
 });
-test("daily amount is separate from the amount for the remainder of the month", () => {
+test("each category has its own daily pacing and historical months have none", () => {
   const envelopes = envelopesForMonth({ "2026-10": b }, [], "2026-10", plan);
   const summary = spendingSummary(envelopes, [], "2026-10", "2026-10-22");
   assert.equal(summary.netRemaining, 50000);
   assert.equal(summary.daysLeft, 10);
-  assert.equal(summary.dailyRemaining, 5000);
-  assert.equal(
-    spendingSummary(envelopes, [], "2026-09", "2026-10-22").dailyRemaining,
-    null,
-  );
+  assert.equal(summary.groceries.leftToday, 3000);
+  assert.equal(summary.shopping.leftToday, 2000);
+  const history = spendingSummary(envelopes, [], "2026-09", "2026-10-22");
+  assert.equal(history.groceries.leftToday, null);
+  assert.equal(history.shopping.leftToday, null);
 });
-test("today overspend is measured against the net monthly budget at the start of today", () => {
-  const rows = [{ ...purchase, date: "2026-10-22", amount: 10000 }];
+test("today's grocery spending changes only grocery pacing, with a stable start-of-day allowance", () => {
+  const rows = [
+    {
+      ...purchase,
+      bucket: "groceries" as const,
+      date: "2026-10-22",
+      amount: 5000,
+    },
+  ];
   const envelopes = envelopesForMonth({ "2026-10": b }, rows, "2026-10", plan);
   const summary = spendingSummary(envelopes, rows, "2026-10", "2026-10-22");
-  assert.equal(summary.allowance, 5000);
-  assert.equal(summary.spentToday, 10000);
-  assert.equal(summary.overToday, 5000);
-  assert.equal(summary.dailyRemaining, 0);
+  assert.equal(summary.groceries.allowance, 3000);
+  assert.equal(summary.groceries.spentToday, 5000);
+  assert.equal(summary.groceries.overToday, 2000);
+  assert.equal(summary.groceries.leftToday, 0);
+  assert.equal(summary.groceries.monthlyRemaining, 25000);
+  assert.equal(summary.shopping.leftToday, 2000);
+});
+test("a grocery refund restores grocery pacing without replenishing shopping", () => {
+  const rows = [
+    {
+      ...purchase,
+      bucket: "groceries" as const,
+      date: "2026-10-22",
+      amount: -1000,
+    },
+  ];
+  const envelopes = envelopesForMonth({ "2026-10": b }, rows, "2026-10", plan);
+  const summary = spendingSummary(envelopes, rows, "2026-10", "2026-10-22");
+  assert.equal(summary.groceries.allowance, 3000);
+  assert.equal(summary.groceries.leftToday, 4000);
+  assert.equal(summary.shopping.leftToday, 2000);
 });
 test("changing an existing purchase to a five-month allocation updates each monthly budget", () => {
   const spread = {

@@ -31,3 +31,10 @@ export function ringSlice(
   }
   return null;
 }
+
+export function chartTap(
+  start: { x: number; y: number },
+  end: { x: number; y: number },
+) {
+  return Math.hypot(end.x - start.x, end.y - start.y) <= 8;
+}

@@ -1,5 +1,14 @@
 import type { Expense } from "./budget";
 import { expenseCategory } from "./money-flow";
+export function dailySpendingRows(expenses: Expense[], date: string) {
+  return expenses.filter(
+    (e) =>
+      e.date === date &&
+      !["essential", "setup", "transfer", "investments"].includes(
+        expenseCategory(e),
+      ),
+  );
+}
 export function spendingTrend(
   expenses: Expense[],
   month: string,
@@ -22,9 +31,10 @@ export function spendingTrend(
         e.date === date &&
         !["essential", "setup", "transfer"].includes(expenseCategory(e)),
     );
-    const spent = rows
-      .filter((e) => e.bucket !== "investment")
-      .reduce((sum, e) => sum + e.amount, 0);
+    const spent = dailySpendingRows(rows, date).reduce(
+      (sum, e) => sum + e.amount,
+      0,
+    );
     remaining -= rows.reduce((sum, e) => sum + e.amount, 0);
     return { day, date, spent, remaining };
   });

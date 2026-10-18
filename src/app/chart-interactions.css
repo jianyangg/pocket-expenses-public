@@ -121,3 +121,134 @@
     background: #0066da;
   }
 }
+
+.trend-date-link {
+  padding: 0;
+  min-height: 22px;
+  border-radius: 0;
+  background: transparent;
+  color: #007aff;
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+}
+.trend-date-link:disabled {
+  color: var(--muted);
+  opacity: 1;
+  cursor: default;
+}
+@media (hover: hover) {
+  .trend-date-link:not(:disabled):hover {
+    background: transparent;
+    text-decoration: underline;
+  }
+}
+.day-activity {
+  margin-top: 16px;
+}
+.day-activity-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -4px -8px 16px;
+}
+.day-activity-nav .quiet {
+  color: #007aff;
+  font-size: 12px;
+  min-height: 44px;
+  padding: 8px;
+}
+.day-activity .section-head {
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.day-activity .section-head h2 {
+  font-size: 18px;
+  scroll-margin-top: 20px;
+}
+.day-activity .section-head > strong {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.day-activity-caption,
+.day-allocation {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+.day-activity-rows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.day-activity-rows > li {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.day-activity-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.day-activity-row > strong {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding-top: 8px;
+}
+.day-activity-merchant {
+  padding: 8px 0;
+  min-height: 44px;
+  text-align: left;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.day-activity-merchant small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+.day-activity-rows .inline-note {
+  margin-top: 4px;
+}
+.day-other-transactions {
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.day-other-transactions > summary {
+  min-height: 44px;
+  padding: 14px 0;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.day-activity-empty {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 24px 0;
+}
+@media (hover: hover) {
+  .day-activity-merchant:hover {
+    color: #007aff;
+    background: transparent;
+  }
+}
+@media (max-width: 420px) {
+  .day-activity .section-head {
+    align-items: flex-start;
+  }
+  .day-activity .section-head h2 {
+    font-size: 16px;
+  }
+}
+
+.trend-chart[data-drilldown="true"] {
+  cursor: pointer;
+}

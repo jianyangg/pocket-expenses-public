@@ -6,18 +6,24 @@ export default function SpendingTrends({
   month,
   today,
   starting,
+  onDateSelect,
 }: {
   expenses: Expense[];
   month: string;
   today: string;
   starting: number;
+  onDateSelect: (date: string) => void;
 }) {
   const points = spendingTrend(expenses, month, today, starting);
   if (!points.length) return null;
   const days = points.length,
     total = points.reduce((n, p) => n + p.spent, 0);
   return (
-    <section className="trend-grid" aria-label="Spending trends">
+    <section
+      id="spending-trends"
+      className="trend-grid"
+      aria-label="Spending trends"
+    >
       <div className="trend-surface">
         <div className="section-head">
           <h2>Daily spending</h2>
@@ -25,6 +31,7 @@ export default function SpendingTrends({
         </div>
         <InteractiveTrendChart
           kind="bar"
+          onDateSelect={onDateSelect}
           label="Daily spending including refunds"
           points={points.map((p) => ({ date: p.date, value: p.spent }))}
         />
@@ -40,6 +47,7 @@ export default function SpendingTrends({
         </div>
         <InteractiveTrendChart
           kind="line"
+          onDateSelect={onDateSelect}
           label="Everyday budget remaining after purchases and refunds"
           points={[
             { date: month + "-01", value: starting, opening: true },
