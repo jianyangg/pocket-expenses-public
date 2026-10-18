@@ -1,3 +1,4 @@
+import { monthlyExpenses } from "./expense-allocation";
 import type { Budget, Expense } from "./budget";
 import { budgetForMonth } from "./storage";
 import { expenseCategory } from "./money-flow";
@@ -26,6 +27,7 @@ export function envelopesForMonth(
   rows: Expense[],
   month: string,
   plan: SpendingPlan,
+  basis: "monthly" | "cash" = "monthly",
 ) {
   let carry = 0;
   for (const m of monthsBetween(
@@ -33,7 +35,10 @@ export function envelopesForMonth(
     month,
   )) {
     const b = budgetForMonth(budgets, m),
-      expenses = rows.filter((e) => e.date.startsWith(m));
+      expenses =
+        basis === "cash"
+          ? rows.filter((e) => e.date.startsWith(m))
+          : monthlyExpenses(rows, m);
     const sum = (c: string) =>
       expenses
         .filter((e) => expenseCategory(e) === c)

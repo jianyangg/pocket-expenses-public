@@ -19,6 +19,7 @@ test("rounded estimates merge once, retain labels, survive rechecks and undo wit
       "003_financial.sql",
       "004_expense_spread.sql",
       "005_reconciliation.sql",
+      "006_item_notes.sql",
     ])
       await db.exec(
         await readFile(new URL("../database/" + file, import.meta.url), "utf8"),
@@ -99,6 +100,7 @@ test("an imported bank duplicate can merge with an existing estimate and separat
       "003_financial.sql",
       "004_expense_spread.sql",
       "005_reconciliation.sql",
+      "006_item_notes.sql",
     ])
       await db.exec(
         await readFile(new URL("../database/" + file, import.meta.url), "utf8"),

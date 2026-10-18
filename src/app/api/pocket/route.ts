@@ -1,3 +1,4 @@
+import { updateExpenseNote } from "@/lib/expense-notes";
 import { possibleMatches } from "@/lib/purchase-matching";
 import { bankQuery } from "@/lib/bank/store";
 import { matchPurchase } from "@/lib/bank/reconcile";
@@ -33,6 +34,9 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     switch (body.action) {
+      case "note":
+        await updateExpenseNote(userId, body.id, body.note);
+        return Response.json({ ok: true });
       case "expense":
         snapshot = validateSnapshot({
           version: 1,
@@ -43,6 +47,8 @@ export async function POST(request: Request) {
           const expense = snapshot.expenses[0];
           const current = await readSnapshot(userId);
           const existing = current.expenses.find((e) => e.id === expense.id);
+          // Item notes are updated independently; stale category edits must not erase them.
+          if (existing) expense.itemNote = existing.itemNote;
           if (
             existing &&
             (existing.source === "bank" || existing.source === "matched")

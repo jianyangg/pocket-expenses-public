@@ -1,4 +1,5 @@
 "use client";
+import InlineExpenseNote from "./inline-expense-note";
 import { useEffect, useId, useRef } from "react";
 import { money, type Expense } from "@/lib/budget";
 import {
@@ -11,19 +12,25 @@ export default function CategoryDetails({
   expenses,
   month,
   onClose,
+  onSaveNote,
+  busy,
 }: {
   category: SpendingCategory | null;
   expenses: Expense[];
   month: string;
   onClose: () => void;
+  onSaveNote: (id: string, note: string) => Promise<boolean>;
+  busy: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useId();
   useEffect(() => {
     const node = dialog.current;
     if (!node) return;
-    if (category && !node.open) node.showModal();
-    else if (!category && node.open) node.close();
+    if (category && !node.open) {
+      node.showModal();
+      node.focus({ preventScroll: true });
+    } else if (!category && node.open) node.close();
   }, [category]);
   const report = category
     ? categoryBreakdown(expenses, month, category)
@@ -33,6 +40,7 @@ export default function CategoryDetails({
   return (
     <dialog
       ref={dialog}
+      tabIndex={-1}
       className="category-details"
       aria-labelledby={title}
       onCancel={(e) => {
@@ -68,6 +76,17 @@ export default function CategoryDetails({
             <li key={e.id}>
               <div>
                 <p>{e.description}</p>
+                <InlineExpenseNote
+                  expense={e}
+                  busy={busy}
+                  onSave={onSaveNote}
+                />
+                {e.budgetAllocation ? (
+                  <small>
+                    {money(e.amount)} this month ·{" "}
+                    {money(e.budgetAllocation.purchaseAmount)} purchase
+                  </small>
+                ) : null}
                 <small>
                   {new Date(e.date + "T12:00:00").toLocaleDateString("en-US", {
                     month: "short",

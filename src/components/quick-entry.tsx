@@ -91,7 +91,7 @@ const QuickEntry = forwardRef<QuickEntryHandle, EntryProps>((props, ref) => {
       >
         <div className="section-head">
           <h2 id="expense-dialog-title">
-            {["Amount", "Description", "Tags"][step]}
+            {editing ? "Edit expense" : ["Amount", "Description", "Tags"][step]}
           </h2>
           <button
             type="button"
@@ -200,6 +200,12 @@ const QuickEntry = forwardRef<QuickEntryHandle, EntryProps>((props, ref) => {
               </datalist>
             </div>
             <div hidden={step !== 2}>
+              {editing ? (
+                <p className="editing-expense-summary">
+                  {editing.description} · $
+                  {Math.abs(editing.amount / 100).toFixed(2)}
+                </p>
+              ) : null}
               {refund ? (
                 <label className="refund-link">
                   Refund for
@@ -251,12 +257,17 @@ const QuickEntry = forwardRef<QuickEntryHandle, EntryProps>((props, ref) => {
                 }}
                 onQuery={setTagQuery}
               />
-              <SpreadControls
-                value={spread}
-                onChange={setSpread}
-                amount={Math.round(Number(amount) * 100)}
-                disabled={busy}
-              />
+              {kind !== "investment" && !refund && bucket !== "transfer" ? (
+                <SpreadControls
+                  value={spread}
+                  onChange={(next) => {
+                    setSpread(next);
+                    if (!next && bucket === "fixed") setBucket("discretionary");
+                  }}
+                  amount={Math.round(Number(amount) * 100)}
+                  disabled={busy}
+                />
+              ) : null}
               <details className="expense-extra-options">
                 <summary>Date, category or refund</summary>
                 <label>
@@ -343,7 +354,11 @@ const QuickEntry = forwardRef<QuickEntryHandle, EntryProps>((props, ref) => {
                     ? "Next"
                     : editing
                       ? "Save changes"
-                      : "Save expense"}
+                      : kind === "investment"
+                        ? "Save investment"
+                        : kind === "refund"
+                          ? "Save refund"
+                          : "Save expense"}
               </button>
             </div>
           </form>

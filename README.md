@@ -21,7 +21,7 @@ Every installation starts with empty expenses and zero budgets. Enter your own f
 
 ## How the numbers work
 
-The **Today** screen shows grocery and discretionary allowances after this month's purchases and refunds, plus a daily pace. Discretionary overspending reduces future months' allowances; carrying unused money forward is optional. Subscriptions, transit and refill reserves remain separate.
+The **Today** screen shows a combined monthly budget balance that includes overspending, separate grocery and shopping balances, and a distinct amount for today. Discretionary overspending reduces future months' allowances; carrying unused money forward is optional. Subscriptions, transit and refill reserves remain separate.
 
 **Available to invest** starts with linked USD bank cash, subtracts credit-card debt, then reserves remaining living costs through the date chosen in Plan and an optional cash buffer. It does not add income that was already received, and excludes noncash depreciation. Unmatched manual estimates remain reserved until matched or confirmed as already reflected in the bank balance. This forecast is designed for a chosen period funded by existing cash; it does not assume future salary receipts.
 
@@ -38,6 +38,7 @@ Connect Chase and other Plaid-supported banks using your own server-side credent
 ## Everyday workflow
 
 - Tap **+** to add an expense, choose **Investment** for a lump sum, or **Refund** to restore a category. Enter amount, description and tags; investment entry needs only amount and description.
-- Use **Review** to confirm possible duplicates and categorise purchases: swipe left for groceries, right for discretionary, or up for other categories.
-- Tap chart categories for the transactions behind each total. Weekly insights show recent changes and repeated spending.
+- Use **Review** to confirm possible duplicates and categorise purchases: swipe left for groceries, right for shopping, or up for other categories. On a computer, press 1 for groceries, 2 for shopping, 3 for transit, or M for more options. The on-screen shortcut guide lists all eight categories; shortcuts pause while typing. Recognised public-transit charges are automatically reviewed.
+- Tap chart categories for the transactions behind each total. Weekly insights show recent changes and repeated spending. Add an item name inline with **What was this?**; it saves without changing the bank merchant or amount.
+- In Activity, tap **Count now or spread** to count a past purchase fully in its purchase month, spread a prepaid purchase, or depreciate a lasting item. Monthly budgets use the chosen allocation; the cash forecast always retains the full payment.
 - Use **Plan** for allowances, carryovers, cash reserves, backups and financial statements. Bank connection controls are in Settings.

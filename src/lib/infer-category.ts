@@ -30,7 +30,10 @@ export function inferCategory(expense: Expense, history: Expense[]): Expense {
     return { ...expense, reviewed: true, bucket: "bill", tags: ["insurance"] };
   if (/\b(coned|con ed|consolidated edison|electricity|internet)\b/.test(text))
     return { ...expense, reviewed: true, bucket: "bill", tags: ["utilities"] };
-  if (/\b(mta|subway|metrocard)\b/.test(text))
+  if (
+    /\b(mta|omny|nyct|subway|metrocard)\b/.test(text) ||
+    expense.tags.includes("transit")
+  )
     return { ...expense, reviewed: true, bucket: "bill", tags: ["transit"] };
   if (
     /\b(amazon prime|prime video|openai|chatgpt|spotify|netflix)\b/.test(text)

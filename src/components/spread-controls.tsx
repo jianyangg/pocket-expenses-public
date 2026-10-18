@@ -15,10 +15,10 @@ export default function SpreadControls({
   return (
     <details className="spread-controls" open={value ? true : undefined}>
       <summary>
-        Spread over time{value ? ` · ${value.months} months` : ""}
+        {value ? `Spread over ${value.months} months` : "Count this month"}
       </summary>
       <label>
-        Recognition
+        How to count this purchase
         <select
           disabled={disabled}
           value={value?.kind ?? "now"}
@@ -33,9 +33,9 @@ export default function SpreadControls({
             )
           }
         >
-          <option value="now">Expense now</option>
-          <option value="prepaid">Prepaid purchase</option>
-          <option value="asset">Depreciable asset</option>
+          <option value="now">Full amount this month</option>
+          <option value="prepaid">Spread a prepaid purchase</option>
+          <option value="asset">Depreciate a lasting item</option>
         </select>
       </label>
       {value ? (
@@ -56,7 +56,8 @@ export default function SpreadControls({
           </label>
           <p className="hint">
             {money(Math.round(Math.abs(amount) / Math.max(1, value.months)))} /
-            month · starts in purchase month
+            month · starts in purchase month. The full cash payment stays on its
+            original date.
           </p>
         </>
       ) : null}

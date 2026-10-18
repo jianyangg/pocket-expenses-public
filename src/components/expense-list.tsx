@@ -1,4 +1,5 @@
 "use client";
+import InlineExpenseNote from "./inline-expense-note";
 import { useState } from "react";
 import BankTransactionDetails from "./bank-transaction-details";
 import { money, type Expense } from "@/lib/budget";
@@ -9,18 +10,20 @@ export default function ExpenseList({
   onDelete,
   busy,
   onUndoMatch,
+  onSaveNote,
 }: {
   expenses: Expense[];
   onEdit: (e: Expense) => void;
   onDelete: (e: Expense) => void;
   busy: boolean;
+  onSaveNote: (id: string, note: string) => Promise<boolean>;
   onUndoMatch?: (id: string) => void;
 }) {
   const [visible, setVisible] = useState(10);
   const [search, setSearch] = useState("");
   const rows = expenses
     .filter((e) =>
-      `${e.description} ${e.tags.map((t) => "#" + t).join(" ")} ${e.bucket}`
+      `${e.description} ${e.itemNote ?? ""} ${e.tags.map((t) => "#" + t).join(" ")} ${e.bucket}`
         .toLowerCase()
         .includes(search.toLowerCase()),
     )
@@ -55,6 +58,11 @@ export default function ExpenseList({
                   >
                     {e.description}
                   </button>
+                  <InlineExpenseNote
+                    expense={e}
+                    busy={busy}
+                    onSave={onSaveNote}
+                  />
                   <p className="entry-state">
                     {e.source === "matched"
                       ? "Matched"
@@ -111,6 +119,22 @@ export default function ExpenseList({
                       onClick={() => onUndoMatch(e.id)}
                     >
                       Undo match
+                    </button>
+                  ) : null}
+                  {e.amount > 0 &&
+                  !["investment", "transfer", "bill"].includes(e.bucket) ? (
+                    <button
+                      className="quiet"
+                      disabled={busy}
+                      onClick={() =>
+                        onEdit(
+                          e.bucket === "fixed" && !e.spread
+                            ? { ...e, bucket: "discretionary" }
+                            : e,
+                        )
+                      }
+                    >
+                      Count now or spread
                     </button>
                   ) : null}
                   <button

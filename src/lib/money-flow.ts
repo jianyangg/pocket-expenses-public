@@ -6,6 +6,8 @@ export function expenseCategory(e: Expense) {
   if (e.bucket === "fixed" && !e.spread) return "setup";
   if (e.bucket === "reserved") return "refills";
   if (e.bucket === "groceries") return "groceries";
+  if (e.bucket === "discretionary" && e.tags.includes("shopping"))
+    return "shopping";
   if (
     e.tags.some((tag) =>
       ["rent", "utilities", "insurance"].includes(tag.toLowerCase()),

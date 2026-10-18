@@ -620,3 +620,169 @@
 .duplicate-candidate {
   margin-bottom: 16px;
 }
+
+.budget-summary-context {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: -8px 0 18px;
+}
+.envelope-summary .available-amount.negative {
+  color: #b3372b;
+}
+.editing-expense-summary {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.inline-item-note.quiet {
+  display: block;
+  width: auto;
+  min-height: 36px;
+  padding: 6px 0;
+  color: #007aff;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.weekly-insights li .inline-item-note.quiet {
+  min-height: 36px;
+  padding: 0 0 10px;
+  font-size: 12px;
+  color: #007aff;
+}
+.inline-note-editor {
+  margin: 6px 0 12px;
+}
+.inline-note-editor input {
+  width: 100%;
+  min-height: 44px;
+  font-size: 16px;
+  padding: 10px 12px;
+}
+.inline-note-editor small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-top: 5px;
+}
+
+.review-choice-panel {
+  margin-top: 18px;
+  padding-top: 18px !important;
+  border-top: 1px solid var(--line) !important;
+}
+.review-choice-panel > legend {
+  padding: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.review-category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.review-category-grid button {
+  min-height: 44px;
+  padding: 12px;
+  font-size: 13px;
+  text-align: left;
+  border-radius: 10px;
+  background: #f2f2f7;
+  color: var(--ink);
+  font-weight: 500;
+}
+.review-category-grid button[aria-pressed="true"] {
+  background: #e5efff;
+  color: #0059be;
+  box-shadow: inset 0 0 0 1.5px #007aff;
+}
+.review-choice-panel summary {
+  min-height: 44px;
+  padding: 12px 0;
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.review-extra-tags summary {
+  line-height: 1.5;
+}
+.review-choice-actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.review-choice-actions button {
+  min-height: 48px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+.review-later {
+  display: block;
+  margin: 8px auto 0;
+  min-height: 44px;
+  font-size: 12px;
+}
+.review-actions {
+  position: static;
+  background: transparent;
+  padding: 0;
+}
+.review-card .review-swipe-zone {
+  touch-action: pan-y;
+  min-height: 0;
+  cursor: default;
+  padding-top: 0;
+}
+
+.review-key,
+.desktop-review-shortcuts {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .review-category-grid button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .review-key {
+    display: inline-flex;
+    font-size: 11px;
+    font-family: inherit;
+    opacity: 0.7;
+    margin-left: 8px;
+  }
+  .desktop-review-shortcuts {
+    display: block;
+    margin: 12px 0 0;
+  }
+  .desktop-review-shortcuts summary {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 8px 0;
+  }
+  .desktop-review-shortcuts > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    font-size: 12px;
+    padding: 8px 0;
+  }
+  .desktop-review-shortcuts kbd {
+    background: #eaeaef;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  .desktop-review-shortcuts small {
+    color: var(--muted);
+    font-size: 11px;
+  }
+}

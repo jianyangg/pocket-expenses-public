@@ -41,7 +41,9 @@ export function toExpense(t: BankTransaction): Expense | null {
           : primary === "ENTERTAINMENT"
             ? "entertainment"
             : primary === "TRANSPORTATION"
-              ? "transport"
+              ? detailed.includes("PUBLIC_TRANSIT")
+                ? "transit"
+                : "transport"
               : null;
   return {
     id: randomUUID(),

@@ -43,7 +43,7 @@ export function cashForecast(
             new RegExp(kind, "i").test(e.description + " " + e.tags.join(" ")),
         )
         .reduce((n, e) => n + e.amount, 0);
-    const envelope = envelopesForMonth(budgets, expenses, month, plan);
+    const envelope = envelopesForMonth(budgets, expenses, month, plan, "cash");
     const essentials =
       Math.max(0, b.rent - Math.max(paid?.rent ?? 0, actual("rent|landlord"))) +
       Math.max(

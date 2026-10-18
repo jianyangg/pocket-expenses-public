@@ -29,6 +29,8 @@ export function validateSnapshot(input: unknown): Snapshot {
   for (const e of s.expenses) {
     if (
       !e ||
+      (e.itemNote !== undefined &&
+        (typeof e.itemNote !== "string" || e.itemNote.length > 500)) ||
       (e.reviewed !== undefined && typeof e.reviewed !== "boolean") ||
       (e.settled !== undefined && typeof e.settled !== "boolean") ||
       (e.payment !== undefined && !["card", "cash"].includes(e.payment)) ||
@@ -125,6 +127,9 @@ export async function saveExpense(
   resolution?: { matchId?: string; separate?: boolean },
 ) {
   await request("POST", { action: "expense", expense: e, resolution });
+}
+export async function saveExpenseNote(id: string, note: string) {
+  await request("POST", { action: "note", id, note });
 }
 export async function removeExpense(
   id: string,

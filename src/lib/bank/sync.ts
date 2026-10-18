@@ -120,7 +120,7 @@ export async function syncBank(
         if (decision === "imported" && expense && owned) {
           expense.id = expenseId!;
           statements.push(
-            sql`insert into expenses(id,user_id,amount,description,tags,bucket,date) values(${expense.id},${userId},${expense.amount},${expense.description},${expense.tags},${expense.bucket},${expense.date}) on conflict(id) do update set amount=excluded.amount,date=excluded.date where expenses.user_id=${userId}`,
+            sql`insert into expenses(id,user_id,amount,description,tags,bucket,date,reviewed) values(${expense.id},${userId},${expense.amount},${expense.description},${expense.tags},${expense.bucket},${expense.date},${expense.reviewed ?? false}) on conflict(id) do update set amount=excluded.amount,date=excluded.date,reviewed=expenses.reviewed or (excluded.reviewed and ${!customized}),bucket=case when not expenses.reviewed and ${!customized} then excluded.bucket else expenses.bucket end,tags=case when not expenses.reviewed and ${!customized} then excluded.tags else expenses.tags end where expenses.user_id=${userId}`,
           );
         }
         if (decision === "imported" && expenseId && !owned)

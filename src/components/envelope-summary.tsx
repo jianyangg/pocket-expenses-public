@@ -1,8 +1,8 @@
 import { money, type Expense } from "@/lib/budget";
-import { expenseCategory } from "@/lib/money-flow";
 import type { Envelopes } from "@/lib/spending-plan";
+import { spendingSummary } from "@/lib/spending-summary";
 export default function EnvelopeSummary({
-  envelopes,
+  envelopes: e,
   expenses,
   today,
   month,
@@ -14,86 +14,86 @@ export default function EnvelopeSummary({
   month: string;
   onPlan: () => void;
 }) {
-  const e = envelopes;
-  const left = [
-    e.groceriesLeft,
-    e.discretionaryLeft,
-    e.transitLeft,
-    e.subscriptionsLeft,
-    e.refillsLeft,
-  ].reduce((n, v) => n + Math.max(0, v), 0);
-  const spentBy = (category: string) =>
-    expenses
-      .filter((p) => p.date === today && expenseCategory(p) === category)
-      .reduce((n, p) => n + p.amount, 0);
-  const spentToday = [
-    "groceries",
-    "shopping",
-    "transit",
-    "subscriptions",
-    "refills",
-  ].reduce((n, c) => n + spentBy(c), 0);
-  const openingRoom =
-    Math.max(0, e.groceriesLeft + spentBy("groceries")) +
-    Math.max(0, e.discretionaryLeft + spentBy("shopping")) +
-    Math.max(0, e.transitLeft + spentBy("transit")) +
-    Math.max(0, e.subscriptionsLeft + spentBy("subscriptions")) +
-    Math.max(0, e.refillsLeft + spentBy("refills"));
-  const days =
-    month === today.slice(0, 7)
-      ? new Date(
-          Number(month.slice(0, 4)),
-          Number(month.slice(5)),
-          0,
-        ).getDate() -
-        Number(today.slice(8)) +
-        1
-      : 0;
-  const allowance = days ? Math.floor(openingRoom / days) : 0;
-  const remaining = allowance - spentToday;
+  const p = spendingSummary(e, expenses, month, today);
   return (
     <section className="envelope-summary">
-      <p className="available-label">Everyday spending left</p>
-      <strong className="available-amount">{money(left)}</strong>
+      <p className="available-label">
+        {p.netRemaining < 0
+          ? "Over this month’s budget"
+          : "Left in this month’s budget"}
+      </p>
+      <strong
+        className={"available-amount " + (p.netRemaining < 0 ? "negative" : "")}
+      >
+        {money(Math.abs(p.netRemaining))}
+      </strong>
+      <p className="budget-summary-context">
+        All spending categories combined, including overspending.
+      </p>
       <div className="envelope-cards">
         <div>
-          <span>Groceries</span>
+          <span>
+            {e.groceriesLeft < 0
+              ? "Groceries over budget"
+              : "Groceries left this month"}
+          </span>
           <strong className={e.groceriesLeft < 0 ? "negative" : ""}>
-            {money(e.groceriesLeft)}
+            {money(Math.abs(e.groceriesLeft))}
           </strong>
         </div>
         <div>
-          <span>Discretionary</span>
+          <span>
+            {e.discretionaryLeft < 0
+              ? "Shopping & dining over budget"
+              : "Shopping & dining left"}
+          </span>
           <strong className={e.discretionaryLeft < 0 ? "negative" : ""}>
-            {money(e.discretionaryLeft)}
+            {money(Math.abs(e.discretionaryLeft))}
           </strong>
-          <small>of {money(e.limit)} / month</small>
+          <small>{money(e.limit)} monthly budget</small>
         </div>
       </div>
-      {days ? (
-        <div className={"today-pace " + (remaining < 0 ? "over" : "")}>
+      {p.daysLeft ? (
+        <div
+          className={
+            "today-pace " + (p.overToday || p.netRemaining < 0 ? "over" : "")
+          }
+        >
           <div>
-            <span>
-              {remaining < 0 ? "Over today’s pace" : "Left to spend today"}
-            </span>
-            <strong>{money(Math.abs(remaining))}</strong>
+            <span>Remaining for today</span>
+            <strong>{money(p.dailyRemaining ?? 0)}</strong>
           </div>
           <small>
-            {money(spentToday)} net spent · {money(allowance)} daily pace
+            {money(p.spentToday)} counted today · {money(p.allowance)} daily
+            budget
           </small>
+          {p.overToday > 0 ? (
+            <small>{money(p.overToday)} over today’s budget.</small>
+          ) : null}
+          {p.netRemaining < 0 ? (
+            <small>
+              Your combined monthly budget is already exceeded. Groceries and
+              other category balances are shown above.
+            </small>
+          ) : (
+            <small>
+              Includes groceries, shopping, dining, transit, subscriptions and
+              refills.
+            </small>
+          )}
         </div>
       ) : null}
       {e.carry < 0 ? (
         <p className="carry-note">
-          {money(-e.carry)} brought forward from earlier overspending.
+          {money(-e.carry)} of earlier overspending is included in this month’s
+          shopping budget.
         </p>
       ) : null}
       {e.discretionaryLeft < 0 ? (
         <p className="carry-note">
-          {money(-e.discretionaryLeft)} will reduce future discretionary
-          allowances.{" "}
+          Shopping overspending reduces future months’ shopping budgets.{" "}
           <button className="quiet" onClick={onPlan}>
-            Adjust plan
+            Edit budget
           </button>
         </p>
       ) : null}

@@ -41,9 +41,9 @@ export async function matchPurchase(
  where user_id=$1 and transaction_id=$2 and active=true and undo_expense is null and (expense_id is null or expense_id=$5::uuid)
  and not exists(select 1 from bank_transactions other where other.user_id=$1 and other.active=true and other.expense_id=$3 and other.transaction_id<>$2)
  returning transaction_id), saved as (
- insert into expenses(id,user_id,amount,description,tags,bucket,date,reviewed,spread,payment,refund_of)
- select $3,$1,$6,$7,$8,$9,$10::date,true,$11::jsonb,'card',$12::uuid from claimed
- on conflict(id) do update set amount=excluded.amount,date=excluded.date,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,reviewed=true,spread=excluded.spread,refund_of=excluded.refund_of where expenses.user_id=$1 returning id), removed as (
+ insert into expenses(id,user_id,amount,description,tags,bucket,date,reviewed,spread,payment,refund_of,item_note)
+ select $3,$1,$6,$7,$8,$9,$10::date,true,$11::jsonb,'card',$12::uuid,$13 from claimed
+ on conflict(id) do update set amount=excluded.amount,date=excluded.date,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,reviewed=true,spread=excluded.spread,refund_of=excluded.refund_of,item_note=excluded.item_note where expenses.user_id=$1 returning id), removed as (
  delete from expenses where user_id=$1 and id=$5::uuid and id<>$3 and exists(select 1 from saved) returning id)
  select id from saved`,
     [
@@ -59,6 +59,7 @@ export async function matchPurchase(
       actual.date,
       JSON.stringify(manual.spread ?? null),
       manual.refundOf ?? null,
+      manual.itemNote ?? "",
     ],
   );
   if (!result.length)
@@ -93,9 +94,9 @@ export async function undoMatch(
   const restored = await query(
     user,
     `with claimed as(update bank_transactions set expense_id=$3,owned=true,customized=false,undo_expense=null,duplicate_checked=true where user_id=$1 and transaction_id=$2 and active=true and undo_expense is not null returning transaction_id), saved as(
- insert into expenses(id,user_id,amount,description,tags,bucket,date,reviewed,spread,payment,refund_of,settled)
- select $4,$1,$5,$6,$7,$8,$9::date,$10,$11::jsonb,$12,$13::uuid,$19 from claimed
- on conflict(id) do update set amount=excluded.amount,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,date=excluded.date,reviewed=excluded.reviewed,spread=excluded.spread,payment=excluded.payment,refund_of=excluded.refund_of,settled=excluded.settled where expenses.user_id=$1 returning id)
+ insert into expenses(id,user_id,amount,description,tags,bucket,date,reviewed,spread,payment,refund_of,settled,item_note)
+ select $4,$1,$5,$6,$7,$8,$9::date,$10,$11::jsonb,$12,$13::uuid,$19,$20 from claimed
+ on conflict(id) do update set amount=excluded.amount,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,date=excluded.date,reviewed=excluded.reviewed,spread=excluded.spread,payment=excluded.payment,refund_of=excluded.refund_of,settled=excluded.settled,item_note=excluded.item_note where expenses.user_id=$1 returning id)
  insert into expenses(id,user_id,amount,description,tags,bucket,date) select $3,$1,$14,$15,$16,$17,$18::date from saved returning id`,
     [
       user,
@@ -117,6 +118,7 @@ export async function undoMatch(
       bank.bucket,
       bank.date,
       manual.settled ?? false,
+      manual.itemNote ?? "",
     ],
   );
   if (!restored.length)

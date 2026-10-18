@@ -1,3 +1,4 @@
+import InlineExpenseNote from "./inline-expense-note";
 import { expenseCategory } from "@/lib/money-flow";
 import { money, type Expense } from "@/lib/budget";
 import { weeklyInsights } from "@/lib/spending-insights";
@@ -12,10 +13,14 @@ export default function WeeklyInsights({
   expenses,
   today,
   onEdit,
+  onSaveNote,
+  busy,
 }: {
   expenses: Expense[];
   today: string;
   onEdit: (e: Expense) => void;
+  onSaveNote: (id: string, note: string) => Promise<boolean>;
+  busy: boolean;
 }) {
   const i = weeklyInsights(expenses, today);
   return (
@@ -48,6 +53,11 @@ export default function WeeklyInsights({
                     </span>
                     <strong>{money(e.amount)}</strong>
                   </button>
+                  <InlineExpenseNote
+                    expense={e}
+                    busy={busy}
+                    onSave={onSaveNote}
+                  />
                 </li>
               ))}
           </ul>

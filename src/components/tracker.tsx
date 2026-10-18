@@ -1,4 +1,5 @@
 "use client";
+import { monthlyExpenses } from "@/lib/expense-allocation";
 import { useCallback, useRef, useState } from "react";
 import { budgetForMonth } from "@/lib/storage";
 import { authClient } from "@/lib/auth/client";
@@ -45,6 +46,7 @@ export default function Tracker() {
     reload,
     add,
     updateBudget,
+    updateNote,
     deleteEntry,
     importFile,
   } = useTracker();
@@ -231,9 +233,11 @@ export default function Tracker() {
             <>
               <MonthlyMoney
                 budget={budget}
-                expenses={expenses}
+                expenses={monthlyExpenses(snapshot.expenses, month)}
                 envelopes={envelopes}
                 onPlan={() => setView("budget")}
+                busy={busy}
+                onSaveNote={updateNote}
                 includeSetup={finance.settings.includeSetup}
                 month={month}
                 today={today}
@@ -272,9 +276,13 @@ export default function Tracker() {
                 expenses={snapshot.expenses}
                 today={today}
                 onEdit={setEditing}
+                onSaveNote={updateNote}
+                busy={busy}
               />
               <SpendingTrends
-                expenses={expenses.filter((e) => e.bucket !== "investment")}
+                expenses={monthlyExpenses(snapshot.expenses, month).filter(
+                  (e) => e.bucket !== "investment",
+                )}
                 month={month}
                 today={today}
                 starting={
@@ -297,6 +305,7 @@ export default function Tracker() {
                 today={today}
                 busy={busy}
                 onSave={add}
+                onSaveNote={updateNote}
               />
             </>
           ) : null}
@@ -308,6 +317,7 @@ export default function Tracker() {
                 onEdit={(e) => {
                   setEditing(e);
                 }}
+                onSaveNote={updateNote}
                 onDelete={(e) => void deleteEntry(e)}
                 onUndoMatch={(id) =>
                   void resolve({ action: "undo", expenseId: id })

@@ -16,7 +16,7 @@ export async function readSnapshot(userId: string): Promise<Snapshot> {
   const [, , expenses, plans, bank] = await sql.transaction([
     sql`set local role pocket_app`,
     sql`select set_config('app.user_id', ${userId}, true)`,
-    sql`select e.id,e.amount,e.description,e.tags,e.bucket,e.reviewed,e.spread,e.payment,e.settled,e.refund_of as "refundOf",to_char(e.date,'YYYY-MM-DD') as date,
+    sql`select e.id,e.amount,e.description,e.tags,e.bucket,e.reviewed,e.spread,e.payment,e.settled,e.item_note as "itemNote",e.refund_of as "refundOf",to_char(e.date,'YYYY-MM-DD') as date,
  case when b.expense_id is null then 'manual' when b.undo_expense is not null or not b.owned then 'matched' else 'bank' end as source,
  (b.undo_expense is not null and b.undo_expense<>'null'::jsonb) as "canUndoMatch",coalesce((b.data->>'pending')::boolean,false) as pending,b.data->>'account_id' as "accountId",b.data as "bankData"
  from expenses e left join lateral(select expense_id,data,owned,undo_expense from bank_transactions where user_id=${userId} and expense_id=e.id and active=true order by (data->>'pending')::boolean limit 1)b on true where e.user_id=${userId} order by e.date,e.id`,
@@ -48,9 +48,9 @@ export async function writeSnapshot(
     ...snapshot.expenses.map(
       (
         e,
-      ) => sql`insert into expenses(id,user_id,amount,description,tags,bucket,date,reviewed,spread,payment,refund_of,settled)
-      values (${e.id},${userId},${e.amount},${e.description},${e.tags},${e.bucket},${e.date},${e.reviewed ?? false},${JSON.stringify(e.spread ?? null)}::jsonb,${e.payment ?? "card"},${e.refundOf ?? null},${e.settled ?? false})
-      on conflict(id) do update set amount=excluded.amount,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,date=excluded.date,reviewed=excluded.reviewed,spread=excluded.spread,payment=excluded.payment,refund_of=excluded.refund_of,settled=excluded.settled
+      ) => sql`insert into expenses(id,user_id,amount,description,tags,bucket,date,reviewed,spread,payment,refund_of,settled,item_note)
+      values (${e.id},${userId},${e.amount},${e.description},${e.tags},${e.bucket},${e.date},${e.reviewed ?? false},${JSON.stringify(e.spread ?? null)}::jsonb,${e.payment ?? "card"},${e.refundOf ?? null},${e.settled ?? false},${e.itemNote ?? ""})
+      on conflict(id) do update set amount=excluded.amount,description=excluded.description,tags=excluded.tags,bucket=excluded.bucket,date=excluded.date,reviewed=excluded.reviewed,spread=excluded.spread,payment=excluded.payment,refund_of=excluded.refund_of,settled=excluded.settled,item_note=excluded.item_note
       where expenses.user_id=${userId}`,
     ),
     ...snapshot.expenses.map(

@@ -1,27 +1,14 @@
 "use client";
-import BankTransactionDetails from "./bank-transaction-details";
 import { useRef, useState } from "react";
-import { buckets, money, type Expense, type Bucket } from "@/lib/budget";
-import { reviewQueue, daysBefore, swipeAction } from "@/lib/review-queue";
-import { normalizeTags } from "@/lib/entry-tags";
-import SpreadControls from "./spread-controls";
-import type { ExpenseSpread } from "@/lib/expense-schedule";
-import TagPicker from "./tag-picker";
-const labels: Record<Bucket, string> = {
-  discretionary: "Spending",
-  groceries: "Groceries",
-  bill: "Bills & transit",
-  investment: "Investing",
-  fixed: "Fixed purchase",
-  reserved: "Reserved refills",
-  review: "Needs review",
-  transfer: "Between my accounts",
-};
+import type { Expense } from "@/lib/budget";
+import { reviewQueue, daysBefore } from "@/lib/review-queue";
+import ExpenseReviewCard from "./expense-review-card";
 type Props = {
   expenses: Expense[];
   today: string;
   busy: boolean;
   onSave: (expense: Expense) => Promise<boolean>;
+  onSaveNote: (id: string, note: string) => Promise<boolean>;
 };
 type History = { expense: Expense; saved: boolean };
 export default function ExpenseReview({
@@ -29,6 +16,7 @@ export default function ExpenseReview({
   today,
   busy,
   onSave,
+  onSaveNote,
 }: Props) {
   const [start, setStart] = useState("2000-01-01");
   const [end, setEnd] = useState(today);
@@ -148,12 +136,13 @@ export default function ExpenseReview({
       {start > end ? (
         <p role="alert">Choose an end date after the start date.</p>
       ) : current ? (
-        <ReviewCard
+        <ExpenseReviewCard
           key={current.id}
           expense={current}
           tags={tags}
           disabled={busy || working}
           onFinish={finish}
+          onSaveNote={onSaveNote}
         />
       ) : (
         <div className="panel review-empty">
@@ -162,197 +151,5 @@ export default function ExpenseReview({
         </div>
       )}
     </section>
-  );
-}
-function ReviewCard({
-  expense,
-  tags: existing,
-  disabled,
-  onFinish,
-}: {
-  expense: Expense;
-  tags: string[];
-  disabled: boolean;
-  onFinish: (expense: Expense, save: boolean) => Promise<void>;
-}) {
-  const [tags, setTags] = useState(expense.tags);
-  const [query, setQuery] = useState("");
-  const [bucket, setBucket] = useState(expense.bucket);
-  const [spread, setSpread] = useState<ExpenseSpread | null>(
-    expense.spread ?? null,
-  );
-  const [drag, setDrag] = useState(0);
-  const pointer = useRef<{ id: number; x: number; y: number } | null>(null);
-  const [options, setOptions] = useState(false);
-  async function classify(value: "groceries" | "discretionary") {
-    setDrag(0);
-    await onFinish(
-      {
-        ...expense,
-        spread,
-        bucket: value,
-        tags: [
-          ...new Set([
-            ...tags.filter((t) => t !== "groceries" && t !== "shopping"),
-            value === "groceries" ? "groceries" : "shopping",
-          ]),
-        ],
-      },
-      true,
-    );
-  }
-  async function finish(save: boolean) {
-    setDrag(0);
-    await onFinish(
-      {
-        ...expense,
-        spread,
-        bucket,
-        tags: [...new Set([...tags, ...normalizeTags(query)])],
-      },
-      save,
-    );
-  }
-  return (
-    <>
-      <article
-        className="panel review-card"
-        style={{ transform: `translateX(${drag}px) rotate(${drag / 25}deg)` }}
-      >
-        <div
-          className="review-swipe-zone"
-          onPointerDown={(e) => {
-            if (
-              disabled ||
-              e.button !== 0 ||
-              (e.target as HTMLElement).closest("a, button, summary, details")
-            )
-              return;
-            pointer.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
-            e.currentTarget.setPointerCapture(e.pointerId);
-          }}
-          onPointerMove={(e) => {
-            if (pointer.current?.id === e.pointerId)
-              setDrag(
-                Math.max(-160, Math.min(160, e.clientX - pointer.current.x)),
-              );
-          }}
-          onPointerCancel={() => {
-            pointer.current = null;
-            setDrag(0);
-          }}
-          onPointerUp={(e) => {
-            if (pointer.current?.id !== e.pointerId) return;
-            const action = swipeAction(
-              e.clientX - pointer.current.x,
-              e.clientY - pointer.current.y,
-            );
-            pointer.current = null;
-            setDrag(0);
-            if (action === "options") setOptions(true);
-            else if (action) void classify(action);
-          }}
-        >
-          <span className="review-date">{expense.date}</span>
-          <h2>{expense.description}</h2>
-          <strong className="review-amount">{money(expense.amount)}</strong>
-          <BankTransactionDetails details={expense.bankDetails} />
-          <p className="hint">← Groceries · Shopping → · ↑ More</p>
-        </div>
-        <fieldset disabled={disabled} hidden={!options}>
-          <legend className="sr-only">Categorize transaction</legend>
-          <div className="review-buckets">
-            {["utilities", "insurance", "transit", "subscriptions"].map(
-              (tag) => (
-                <button
-                  type="button"
-                  key={tag}
-                  onClick={() => {
-                    setBucket("bill");
-                    setTags([tag]);
-                  }}
-                >
-                  {tag[0].toUpperCase() + tag.slice(1)}
-                </button>
-              ),
-            )}
-            {(["discretionary", "groceries", "bill"] as Bucket[]).map(
-              (value) => (
-                <button
-                  type="button"
-                  key={value}
-                  aria-pressed={bucket === value}
-                  onClick={() => setBucket(value)}
-                >
-                  {labels[value]}
-                </button>
-              ),
-            )}
-          </div>
-          <details>
-            <summary>Other categories</summary>
-            <select
-              aria-label="Budget category"
-              value={bucket}
-              onChange={(e) => setBucket(e.target.value as Bucket)}
-            >
-              {buckets.map((value) => (
-                <option key={value} value={value}>
-                  {labels[value]}
-                </option>
-              ))}
-            </select>
-          </details>
-          <TagPicker
-            tags={tags}
-            query={query}
-            existing={existing}
-            onTags={(values) => {
-              setTags(values);
-              if (values.includes("groceries")) setBucket("groceries");
-            }}
-            onQuery={setQuery}
-          />
-          <SpreadControls
-            value={spread}
-            onChange={setSpread}
-            amount={expense.amount}
-            disabled={disabled}
-          />
-        </fieldset>
-      </article>
-      <div className="review-actions">
-        <button disabled={disabled} onClick={() => void classify("groceries")}>
-          ← Groceries
-        </button>
-        <button
-          className="quiet"
-          disabled={disabled}
-          onClick={() => setOptions((v) => !v)}
-        >
-          ↑ More
-        </button>
-        <button
-          disabled={disabled}
-          onClick={() => void classify("discretionary")}
-        >
-          Shopping →
-        </button>
-      </div>
-      {options ? (
-        <div className="review-actions">
-          <button
-            className="quiet"
-            disabled={disabled}
-            onClick={() => void finish(false)}
-          >
-            Skip
-          </button>
-          <button disabled={disabled} onClick={() => void finish(true)}>
-            Save choice
-          </button>
-        </div>
-      ) : null}
-    </>
   );
 }

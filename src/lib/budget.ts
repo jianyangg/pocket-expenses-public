@@ -10,6 +10,8 @@ export const buckets = [
 ] as const;
 export type Bucket = (typeof buckets)[number];
 export type Expense = {
+  itemNote?: string;
+  budgetAllocation?: { purchaseAmount: number; purchaseDate: string };
   bankDetails?: import("./bank/transaction-details").BankDetails;
   reviewed?: boolean;
   source?: "manual" | "bank" | "matched";

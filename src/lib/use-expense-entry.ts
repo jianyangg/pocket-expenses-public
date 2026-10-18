@@ -92,14 +92,14 @@ export function useExpenseEntry({
   const [date, setDate] = useState(editing?.date ?? todayInNewYork());
   const [error, setError] = useState("");
   const [open, setOpen] = useState(!!editing);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(editing ? 2 : 0);
   const viewportStyle = useVisualViewport(open);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const addRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (open && !dialogRef.current?.open) {
       dialogRef.current?.showModal();
-      amountRef.current?.focus();
+      (editing ? tagRef : amountRef).current?.focus();
     }
     if (!open && dialogRef.current?.open) dialogRef.current.close();
     if (!open) return;

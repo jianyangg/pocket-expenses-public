@@ -44,7 +44,7 @@ export default function CashForecast({
   return (
     <section className="panel forecast-card">
       <div className="section-head">
-        <h2>Available to invest</h2>
+        <h2>More you could invest</h2>
         <button className="quiet" disabled={loading} onClick={onRefresh}>
           {loading ? "Checking…" : "Refresh"}
         </button>
@@ -59,10 +59,10 @@ export default function CashForecast({
             ? "Connect a bank to calculate from current cash."
             : stale
               ? "Bank balances are over a day old. Refresh before moving money."
-              : `After living costs through ${plan.through}. ${plan.buffer ? money(plan.buffer) + " buffer kept." : "No emergency buffer kept."}`}
+              : `After reserving living costs through ${plan.through}. ${plan.buffer ? money(plan.buffer) + " buffer kept." : "No emergency buffer kept."}`}
       </p>
       <div className="forecast-invested">
-        <span>Investments logged since {plan.startMonth}</span>
+        <span>Already transferred to investments since {plan.startMonth}</span>
         <strong>{money(invested)}</strong>
       </div>
       <details>
@@ -77,7 +77,7 @@ export default function CashForecast({
             <dd>−{money(f.reserved)}</dd>
           </div>
           <div>
-            <dt>Unmatched manual estimates</dt>
+            <dt>Payments not yet confirmed in bank cash</dt>
             <dd>−{money(f.manualReserve)}</dd>
           </div>
           <div>

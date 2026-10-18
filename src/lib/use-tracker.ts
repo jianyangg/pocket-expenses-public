@@ -9,6 +9,7 @@ import {
   removeExpense,
   saveBudget,
   saveExpense,
+  saveExpenseNote,
   validateSnapshot,
   type Snapshot,
 } from "@/lib/storage";
@@ -104,6 +105,13 @@ export function useTracker() {
       setNotice("Saved.");
     });
   }
+  async function updateNote(id: string, note: string) {
+    return mutate(async () => {
+      await saveExpenseNote(id, note);
+      await reload(true);
+      setNotice("Item details saved.");
+    });
+  }
   async function updateBudget(b: Budget) {
     await mutate(async () => {
       await saveBudget(month, b, snapshot, user?.id);
@@ -155,6 +163,7 @@ export function useTracker() {
     reload,
     add,
     updateBudget,
+    updateNote,
     deleteEntry,
     importFile,
   };

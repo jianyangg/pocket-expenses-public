@@ -1,4 +1,5 @@
 "use client";
+import { budgetRemaining } from "@/lib/spending-summary";
 import { useState } from "react";
 import { money, type Budget, type Expense } from "@/lib/budget";
 import { moneyFlow } from "@/lib/money-flow";
@@ -19,6 +20,8 @@ export default function MonthlyMoney({
   today,
   onPlan,
   children,
+  onSaveNote,
+  busy,
 }: {
   budget: Budget;
   expenses: Expense[];
@@ -28,21 +31,17 @@ export default function MonthlyMoney({
   today: string;
   onPlan: () => void;
   children?: React.ReactNode;
+  onSaveNote: (id: string, note: string) => Promise<boolean>;
+  busy: boolean;
 }) {
   const [selected, setSelected] = useState<SpendingCategory | null>(null);
   const p = moneyFlow(budget, expenses, includeSetup);
-  const left = [
-    envelopes.groceriesLeft,
-    envelopes.discretionaryLeft,
-    envelopes.subscriptionsLeft,
-    envelopes.transitLeft,
-    envelopes.refillsLeft,
-  ].reduce((n, v) => n + Math.max(0, v), 0);
+  const left = budgetRemaining(envelopes);
   const slices = [
     ...spendingCategories
       .filter((c) => c.key !== "investments")
       .map((c) => ({ label: c.label, amount: p[c.key] })),
-    { label: "Available", amount: Math.max(0, left) },
+    { label: "Budget left", amount: Math.max(0, left) },
   ];
   return (
     <section className="money-overview">
@@ -70,8 +69,8 @@ export default function MonthlyMoney({
         </div>
         <DonutChart
           slices={slices}
-          label="Everyday spending"
-          isSelectable={(label) => label !== "Available"}
+          label="Monthly budget"
+          isSelectable={(label) => label !== "Budget left"}
           onSelect={(label) =>
             setSelected(
               spendingCategories.find((c) => c.label === label)?.key ?? null,
@@ -103,6 +102,8 @@ export default function MonthlyMoney({
         category={selected}
         expenses={expenses}
         month={month}
+        onSaveNote={onSaveNote}
+        busy={busy}
         onClose={() => setSelected(null)}
       />
     </section>
